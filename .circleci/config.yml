@@ -41,33 +41,24 @@ jobs:
           sudo apt-cache madison docker-ce
       - run: |
           sudo apt-get install docker-ce=5:19.03.3~3-0~ubuntu-xenial docker-ce-cli=5:19.03.3~3-0~ubuntu-xenial
-
           docker version
-
           mkdir -p ~/.docker/cli-plugins
           wget https://github.com/docker/buildx/releases/download/v0.3.1/buildx-v0.3.1.linux-amd64
           mv buildx-v0.3.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
           chmod a+x ~/.docker/cli-plugins/docker-buildx
 #      - run: |
-#          sudo apt-get remove docker docker-engine docker.io runc
-#          sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
-#          curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-#          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-#          sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io
-#          sudo docker run hello-world
-#      - run: |
 #          DOCKER_BUILDKIT=1
 #          docker build --platform=local -o . git://github.com/docker/buildx
 #          mv buildx ~/.docker/cli-plugins/docker-buildx
-#      - run: |
-#          docker buildx ls
-#          docker buildx create --name newbuilder
-#          docker buildx use newbuilder
-#      - checkout
-#      - run: |
-#          TAG=0.$CIRCLE_BUILD_NUM
-#          docker login -u $DOCKER_USER -p $DOCKER_PASS
-#          docker buildx build --platform linux/arm/v7,linux/amd64 --push -t $IMAGE_NAME:$TAG  ./cmd/producer/
+      - run: |
+          docker buildx ls
+          docker buildx create --name newbuilder
+          docker buildx use newbuilder
+      - checkout
+      - run: |
+          TAG=0.$CIRCLE_BUILD_NUM
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          docker buildx build --platform linux/arm/v7,linux/amd64 --push -t $IMAGE_NAME:$TAG  ./cmd/producer/
 workflows:
   version: 2
   build-test-push:
