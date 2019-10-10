@@ -52,7 +52,7 @@ jobs:
 #          mv buildx ~/.docker/cli-plugins/docker-buildx
       - run: |
           docker buildx ls
-          docker buildx create --name newbuilder
+          docker buildx create --name newbuilder --platform linux/amd64,linux/arm/v7
           docker buildx use newbuilder
           docker buildx inspect --bootstrap
           docker buildx ls
