@@ -1,19 +1,23 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/d2r2/go-bsbmp"
 	"github.com/d2r2/go-i2c"
 	"github.com/d2r2/go-logger"
 	"log"
 	"math"
+	"time"
 )
 
-//TODO add timestamp
 type SensorValues struct {
+	Timestamp string
 	Temperature float64
 	Humidity    float64
 	Pressure    float64
 }
+
+var sensor *bsbmp.BMP
 
 func setupSensor() {
 	// Change loglevel of packages to omit debug output
@@ -71,12 +75,36 @@ func readPressure() float64 {
 
 func readSensor() SensorValues {
 	values := SensorValues{
-		Temperature: readTemperature(),
-		Humidity:    readHumidity(),
-		Pressure:    readPressure(),
+		Timestamp: 	 	time.Now().UTC().Format("20060102150405"),
+		Temperature: 	readTemperature(),
+		Humidity:		readHumidity(),
+		Pressure:		readPressure(),
 	}
-
 	return values
+}
+
+func read() <-chan []byte {
+	ch := make(chan []byte)
+
+	// Measure data continuously and send over channel to publisher
+	go func() {
+		defer close(ch)
+		for {
+			ch <- readSensorJSON()
+			time.Sleep(*samplerate)
+		}
+	}()
+
+	return ch
+}
+
+// Returns marshalled JSON as byte array
+func readSensorJSON() []byte {
+	j, err := json.Marshal(readSensor())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return j
 }
 
 // This function rounds floats to 2 decimal places
