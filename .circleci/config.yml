@@ -35,19 +35,19 @@ jobs:
     environment:
       - IMAGE_NAME: oliviermichaelis/producer
     steps:
-      - run:
-          name: Install latest Docker
-          command: |
-            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-            sudo apt-get update
-            sudo apt-get install docker-ce
+      - run: |
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt-get update
+          sudo apt-cache madison docker-ce
+      - run: |
+          sudo apt-get install docker-ce
 
-            docker version
+          docker version
 
-            mkdir -p ~/.docker/cli-plugins
-            wget https://github.com/docker/buildx/releases/download/v0.3.1/buildx-v0.3.1.linux-amd64
-            mv buildx-v0.3.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
-            chmod a+x ~/.docker/cli-plugins/docker-buildx
+          mkdir -p ~/.docker/cli-plugins
+          wget https://github.com/docker/buildx/releases/download/v0.3.1/buildx-v0.3.1.linux-amd64
+          mv buildx-v0.3.1.linux-amd64 ~/.docker/cli-plugins/docker-buildx
+          chmod a+x ~/.docker/cli-plugins/docker-buildx
 #      - run: |
 #          sudo apt-get remove docker docker-engine docker.io runc
 #          sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
