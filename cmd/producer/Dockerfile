@@ -7,8 +7,8 @@ RUN cd /src && go build -o producer
 
 # final stage
 FROM alpine
-RUN addgroup -S producer && adduser -S producer -G producer
-USER producer
+#RUN addgroup -S producer && adduser -S producer -G producer
+#USER producer
 WORKDIR /app
 COPY --from=build-env /src/producer /app/
 ENTRYPOINT ./producer
