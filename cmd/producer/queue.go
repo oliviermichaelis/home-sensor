@@ -128,7 +128,7 @@ func publish(sessions chan chan session, messages <-chan []byte) {
 
 			case body = <-pending:
 				routingKey := "sensor"
-				err := pub.Publish(exchange, routingKey, false, false, amqp.Publishing{
+				err := pub.Publish(exchange, routingKey, true, false, amqp.Publishing{
 					Body: body,
 				})
 				// Retry failed delivery on the next session

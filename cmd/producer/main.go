@@ -18,9 +18,9 @@ var (
 
 // Environment variables
 var (
-	url = os.Getenv("RABBITMQ_URI")
-	queue = os.Getenv("RABBITMQ_QUEUE")
-	exchange = os.Getenv("RABBITMQ_EXCHANGE")
+	url = getEnv("AMQP_URL", "amqp://guest:guest@127.0.0.1:5672/")
+	queue = getEnv("RABBITMQ_QUEUE", "sensor")
+	exchange = getEnv("RABBITMQ_EXCHANGE", "sensor")
 )
 
 var connection i2c.I2C
@@ -37,4 +37,12 @@ func main() {
 		done()
 	}()
 	<-ctx.Done()
+}
+
+func getEnv(key, fallback string) string {
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		value = fallback
+	}
+	return value
 }
