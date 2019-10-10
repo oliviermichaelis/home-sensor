@@ -36,8 +36,8 @@ jobs:
       - IMAGE_NAME: oliviermichaelis/producer
     working_directory: /go/src/github.com/oliviermichaelis/home-sensor
     steps:
+      - run: apt-get update && apt-get install -y g
       - checkout
-      - run: apt-get update && apt-get install -y go
       - run:
           name: Install latest Docker
           command: |
