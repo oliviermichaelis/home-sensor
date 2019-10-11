@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"github.com/d2r2/go-i2c"
+	"io/ioutil"
+	"log"
 	"os"
 	"time"
 )
@@ -18,9 +21,11 @@ var (
 
 // Environment variables
 var (
-	url = getEnv("AMQP_URL", "amqp://guest:guest@127.0.0.1:5672/")
+	serviceURL = getEnv("RABBITMQ_SERVICE_URL", "rabbitmq-ha.default.svc.cluster.local")
+	servicePort = getEnv("RABBITMQ_SERVICE_PORT", "5672")
 	queue = getEnv("RABBITMQ_QUEUE", "sensor")
 	exchange = getEnv("RABBITMQ_EXCHANGE", "sensor")
+	secretPath = getEnv("SECRET_PATH", "/passwords")
 )
 
 var connection i2c.I2C
@@ -33,7 +38,7 @@ func main() {
 	// Start publishing messages
 	ctx, done := context.WithCancel(context.Background())
 	go func() {
-		publish(redial(ctx, url), read())
+		publish(redial(ctx, assembleURL()), read())
 		done()
 	}()
 	<-ctx.Done()
@@ -46,3 +51,16 @@ func getEnv(key, fallback string) string {
 	}
 	return value
 }
+
+func assembleURL() string {
+	username, err := ioutil.ReadFile(secretPath + "/username")
+	if err != nil {
+		log.Fatal(err)
+	}
+	password, err := ioutil.ReadFile(secretPath + "password")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return fmt.Sprintf("amqp://%s:%s@%s:%s/", string(username), string(password), serviceURL, servicePort)
+}
+

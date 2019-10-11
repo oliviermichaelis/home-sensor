@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "helm.fullname" . }}-producer
+  labels:
+{{ include "helm.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "helm.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "helm.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.producer.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.producer.image.repository }}:{{ .Values.producer.image.tag }}"
+          imagePullPolicy: {{ .Values.producer.image.pullPolicy }}
+          env:
+            - name: RABBITMQ_SERVICE_URL
+              value: {{ .Values.producer.rabbitmq.url }}
+            - name: RABBITMQ_SERVICE_PORT
+              value: {{ .Values.producer.rabbitmq.port }}
+            - name: RABBITMQ_QUEUE
+              value: {{ .Values.producer.rabbitmq.queue }}
+            - name: RABBITMQ_EXCHANGE
+              value: {{ .Values.producer.rabbitmq.exchange }}
+            - name: SECRET_PATH
+              value: {{ .Values.producer.volume.mountPath }}
+#          ports:
+#            - name: http
+#              containerPort: 80
+#              protocol: TCP
+#          livenessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+          volumeMounts:
+            - mountPath: /dev/i2c-1
+              name: dev-i2c
+            - name: passwords
+              mountPath: {{ .Values.producer.volume.mountPath }}
+          securityContext:
+            privileged: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: dev-i2c
+          hostPath:
+            path: {{ .Values.producer.i2c.path }}
+        - name: passwords
+          secret:
+            secretName: {{ .Values.producer.secretName }}
+            items:
+              - key: rabbitmq-password
+                path: password
+              - key: rabbitmq-username
+                path: username
+      {{- with .Values.producer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
