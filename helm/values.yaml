@@ -7,16 +7,15 @@ replicaCount: 1
 producer:
   image:
     repository: oliviermichaelis/producer
-    tag: 0.41
+    tag: 0.45
     pullPolicy: IfNotPresent
   i2c:
     path: /dev/i2c-1
-  rabbitmq:
-    user: guest
-    url: rabbitmq-ha.default.svc.cluster.local
-    port: 5672
-    queue: sensor
-    exchange: sensor
+  env:
+    RABBITMQ_SERVICE_URL: rabbitmq-ha.default.svc.cluster.local
+    RABBITMQ_SERVICE_PORT: 5672
+    RABBITMQ_QUEUE: sensor
+    RABBITMQ_EXCHANGE: sensor
   secretName: rabbitmq-ha
   volume:
     mountPath: /passwords

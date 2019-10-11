@@ -26,15 +26,15 @@ spec:
           imagePullPolicy: {{ .Values.producer.image.pullPolicy }}
           env:
             - name: RABBITMQ_SERVICE_URL
-              value: {{ .Values.producer.rabbitmq.url }}
+              value: {{ .Values.producer.env.RABBITMQ_SERVICE_URL | quote }}
             - name: RABBITMQ_SERVICE_PORT
-              value: {{ .Values.producer.rabbitmq.port }}
+              value: {{ .Values.producer.env.RABBITMQ_SERVICE_PORT | quote }}
             - name: RABBITMQ_QUEUE
-              value: {{ .Values.producer.rabbitmq.queue }}
+              value: {{ .Values.producer.env.RABBITMQ_QUEUE |quote }}
             - name: RABBITMQ_EXCHANGE
-              value: {{ .Values.producer.rabbitmq.exchange }}
+              value: {{ .Values.producer.env.RABBITMQ_EXCHANGE |quote }}
             - name: SECRET_PATH
-              value: {{ .Values.producer.volume.mountPath }}
+              value: {{ .Values.producer.volume.mountPath | quote }}
 #          ports:
 #            - name: http
 #              containerPort: 80

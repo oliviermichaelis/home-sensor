@@ -57,7 +57,7 @@ func assembleURL() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	password, err := ioutil.ReadFile(secretPath + "password")
+	password, err := ioutil.ReadFile(secretPath + "/password")
 	if err != nil {
 		log.Fatal(err)
 	}
