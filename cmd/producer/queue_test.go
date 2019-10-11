@@ -35,6 +35,6 @@ func mockedReader() <-chan []byte {
 }
 
 func TestPublishSuccessful(t *testing.T) {
-	url = "amqp://guest:guest@127.0.0.1:5672/"
+	url := "amqp://guest:guest@127.0.0.1:5672/"
 	publish(redial(ctx, url), mockedReader())
 }
