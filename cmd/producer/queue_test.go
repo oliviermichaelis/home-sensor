@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/oliviermichaelis/home-sensor/pkg/connect"
 	"os"
 	"testing"
 )
@@ -36,5 +37,5 @@ func mockedReader() <-chan []byte {
 
 func TestPublishSuccessful(t *testing.T) {
 	url := "amqp://guest:guest@127.0.0.1:5672/"
-	publish(redial(ctx, url), mockedReader())
+	publish(connect.Redial(ctx, url, "sensor", "sensor"), mockedReader())
 }
