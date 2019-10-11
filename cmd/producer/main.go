@@ -63,4 +63,3 @@ func assembleURL() string {
 	}
 	return fmt.Sprintf("amqp://%s:%s@%s:%s/", string(username), string(password), serviceURL, servicePort)
 }
-

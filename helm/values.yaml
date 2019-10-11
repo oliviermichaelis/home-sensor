@@ -7,7 +7,7 @@ replicaCount: 1
 producer:
   image:
     repository: oliviermichaelis/producer
-    tag: 0.45
+    tag: 0.46
     pullPolicy: IfNotPresent
   i2c:
     path: /dev/i2c-1
