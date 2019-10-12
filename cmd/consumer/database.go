@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var sensorBP = influxdb.BatchPointsConfig{
+var sensorBP = influxdb.BatchPointsConfig {
 	Precision:        "",
 	Database:         "sensor",
 	RetentionPolicy:  "",
@@ -15,7 +15,7 @@ var sensorBP = influxdb.BatchPointsConfig{
 }
 
 func setupClient() influxdb.Client {
-	config := influxdb.HTTPConfig{
+	config := influxdb.HTTPConfig {
 		Addr:               environment.InfluxURL(),	//TODO read from ENV
 		Username:           "telegraf",			//TODO read from file
 		Password:           "secretpassword",	//TODO read from file
