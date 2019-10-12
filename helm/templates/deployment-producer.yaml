@@ -5,7 +5,7 @@ metadata:
   labels:
 {{ include "helm.labels" . | indent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.producer.replicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "helm.name" . }}
@@ -30,9 +30,9 @@ spec:
             - name: RABBITMQ_SERVICE_PORT
               value: {{ .Values.producer.env.RABBITMQ_SERVICE_PORT | quote }}
             - name: RABBITMQ_QUEUE
-              value: {{ .Values.producer.env.RABBITMQ_QUEUE |quote }}
+              value: {{ .Values.producer.env.RABBITMQ_QUEUE | quote }}
             - name: RABBITMQ_EXCHANGE
-              value: {{ .Values.producer.env.RABBITMQ_EXCHANGE |quote }}
+              value: {{ .Values.producer.env.RABBITMQ_EXCHANGE | quote }}
             - name: RABBITMQ_SECRET_PATH
               value: {{ .Values.producer.volume.mountPath | quote }}
 #          ports:
@@ -64,10 +64,10 @@ spec:
           secret:
             secretName: {{ .Values.producer.secretName }}
             items:
-              - key: rabbitmq-password
-                path: password
               - key: rabbitmq-username
                 path: username
+              - key: rabbitmq-password
+                path: password
       {{- with .Values.producer.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
