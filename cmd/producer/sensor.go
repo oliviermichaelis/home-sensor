@@ -5,17 +5,11 @@ import (
 	"github.com/d2r2/go-bsbmp"
 	"github.com/d2r2/go-i2c"
 	"github.com/d2r2/go-logger"
+	"github.com/oliviermichaelis/home-sensor/pkg/environment"
 	"log"
 	"math"
 	"time"
 )
-
-type SensorValues struct {
-	Timestamp string
-	Temperature float64
-	Humidity    float64
-	Pressure    float64
-}
 
 var sensor *bsbmp.BMP
 
@@ -73,8 +67,8 @@ func readPressure() float64 {
 	return round(float64(p))
 }
 
-func readSensor() SensorValues {
-	values := SensorValues{
+func readSensor() environment.SensorValues {
+	values := environment.SensorValues{
 		Timestamp: 	 	time.Now().UTC().Format("20060102150405"),
 		Temperature: 	readTemperature(),
 		Humidity:		readHumidity(),

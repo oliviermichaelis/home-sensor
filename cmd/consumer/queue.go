@@ -6,11 +6,9 @@ import (
 	"log"
 )
 
-// subscribe consumes deliveries from an exclusive queue from a fanout exchange and sends to the application specific messages chan.
+// Consumes from a queue and sends the message to a channel used by the influxdb writer
 func subscribe(sessions chan chan connect.Session, messages chan<- []byte) {
-	// TODO might be a bug
 	queue := environment.GetQueue()
-
 	for session := range sessions {
 		sub := <-session
 
@@ -29,7 +27,7 @@ func subscribe(sessions chan chan connect.Session, messages chan<- []byte) {
 
 		for msg := range deliveries {
 			messages <- []byte(msg.Body)
-			if err = sub.Ack(msg.DeliveryTag, false); err != nil {
+			if err = sub.Ack(msg.DeliveryTag, false); err != nil {		//TODO move ack to when insert to db succeeded
 				log.Fatal(err)
 			}
 		}

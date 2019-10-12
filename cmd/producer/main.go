@@ -26,7 +26,7 @@ func main() {
 	// Start publishing messages
 	ctx, done := context.WithCancel(context.Background())
 	go func() {
-		publish(connect.Redial(ctx, environment.AssembleURL(), environment.GetExchange(), environment.GetQueue()), read())
+		publish(connect.Redial(ctx, environment.RabbitmqURL(), environment.GetExchange(), environment.GetQueue()), read())
 		done()
 	}()
 	<-ctx.Done()

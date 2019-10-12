@@ -33,7 +33,7 @@ spec:
               value: {{ .Values.producer.env.RABBITMQ_QUEUE |quote }}
             - name: RABBITMQ_EXCHANGE
               value: {{ .Values.producer.env.RABBITMQ_EXCHANGE |quote }}
-            - name: SECRET_PATH
+            - name: RABBITMQ_SECRET_PATH
               value: {{ .Values.producer.volume.mountPath | quote }}
 #          ports:
 #            - name: http
