@@ -16,9 +16,9 @@ var sensorBP = influxdb.BatchPointsConfig {
 
 func setupClient() influxdb.Client {
 	config := influxdb.HTTPConfig {
-		Addr:               environment.InfluxURL(),	//TODO read from ENV
-		Username:           "telegraf",			//TODO read from file
-		Password:           "secretpassword",	//TODO read from file
+		Addr:               environment.InfluxURL(),
+		Username:           environment.ReadUsername(environment.ISecret),
+		Password:           environment.ReadPassword(environment.ISecret),
 		UserAgent:          "",
 		Timeout:            0,
 		InsecureSkipVerify: false,

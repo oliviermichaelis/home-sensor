@@ -20,13 +20,14 @@ var (
 	rPort    = GetEnv("RABBITMQ_SERVICE_PORT", "5672")
 	queue    = GetEnv("RABBITMQ_QUEUE", "sensor")
 	exchange = GetEnv("RABBITMQ_EXCHANGE", "sensor")
-	rSecret  = GetEnv("RABBITMQ_SECRET_PATH", "/passwords")
+	rSecret  = GetEnv("RABBITMQ_SECRET_PATH", "/credentials/rabbit")
 	iURL     = GetEnv("INFLUX_SERVICE_URL", "localhost")
 	iPort    = GetEnv("INFLUX_SERVICE_PORT", "8086")
+	ISecret  = GetEnv("INFLUX_SECRET_PATH", "/credentials/influx")
 )
 
 func RabbitmqURL() string {
-	return fmt.Sprintf("amqp://%s:%s@%s:%s/", readUsername(rSecret), readPassword(rSecret), rURL, rPort)
+	return fmt.Sprintf("amqp://%s:%s@%s:%s/", ReadUsername(rSecret), ReadPassword(rSecret), rURL, rPort)
 }
 
 // Returns the connection URL for the influxdb client
@@ -34,7 +35,7 @@ func InfluxURL() string {
 	return fmt.Sprintf("http://%s:%s", iURL, iPort)
 }
 
-func readUsername(secretPath string) string {
+func ReadUsername(secretPath string) string {
 	u, err := ioutil.ReadFile(secretPath + "/username")
 	if err != nil {
 		log.Fatal(err)
@@ -42,7 +43,7 @@ func readUsername(secretPath string) string {
 	return string(u)
 }
 
-func readPassword(secretPath string) string {
+func ReadPassword(secretPath string) string {
 	p, err := ioutil.ReadFile(secretPath + "/password")
 	if err != nil {
 		log.Fatal(err)

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ include "helm.fullname" . }}-consumer
   labels:
-  {{ include "helm.labels" . | indent 4 }}
+{{ include "helm.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.consumer.replicaCount }}
   selector:
@@ -17,50 +17,60 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
     {{- with .Values.consumer.imagePullSecrets }}
-    imagePullSecrets:
-      {{- toYaml . | nindent 8 }}
-    {{- end }}
-    containers:
-      - name: {{ .Chart.Name }}
-        image: "{{ .Values.consumer.image.repository }}:{{ .Values.consumer.image.tag }}"
-        imagePullPolicy: {{ .Values.consumer.image.pullPolicy }}
-        env:
-          - name: INFLUX_SERVICE_URL
-            value: {{ .Values.consumer.env.INFLUX_SERVICE_URL | quote }}
-          - name: INFLUX_SERVICE_PORT
-            value: {{ .Values.consumer.env.INFLUX_SERVICE_PORT | quote }}
-        #          ports:
-        #            - name: http
-        #              containerPort: 80
-        #              protocol: TCP
-        #          livenessProbe:
-        #            httpGet:
-        #              path: /
-        #              port: http
-        #          readinessProbe:
-        #            httpGet:
-        #              path: /
-        #              port: http
-        volumeMounts:
-          - name: passwords
-            mountPath: {{ .Values.consumer.volume.mountPath }}
-        securityContext:
-          privileged: false
-        resources:
-          {{- toYaml .Values.resources | nindent 12 }}
-    volumes:
-      - name: passwords
-        secret:
-          secretName: {{ .Values.consumer.secretName }}
-          items:
-            - key: influxdb-user
-              path: username
-            - key: influxdb-password
-              path: password
-    {{- with .Values.consumer.nodeSelector }}
-    nodeSelector:
-      {{- toYaml . | nindent 8 }}
-    {{- end }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.consumer.image.repository }}:{{ .Values.consumer.image.tag }}"
+          imagePullPolicy: {{ .Values.consumer.image.pullPolicy }}
+          env:
+            - name: INFLUX_SERVICE_URL
+              value: {{ .Values.consumer.env.INFLUX_SERVICE_URL | quote }}
+            - name: INFLUX_SERVICE_PORT
+              value: {{ .Values.consumer.env.INFLUX_SERVICE_PORT | quote }}
+          #          ports:
+          #            - name: http
+          #              containerPort: 80
+          #              protocol: TCP
+          #          livenessProbe:
+          #            httpGet:
+          #              path: /
+          #              port: http
+          #          readinessProbe:
+          #            httpGet:
+          #              path: /
+          #              port: http
+          volumeMounts:
+            - name: influxdb-credentials
+              mountPath: {{ .Values.consumer.volume.mountPathInflux }}
+            - name: rabbitmq-credentials
+              mountPath: {{ .Values.consumer.volume.mountPathRabbit }}
+          securityContext:
+            privileged: false
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: rabbitmq-credentials
+          secret:
+            secretName: {{ .Values.consumer.rabbitmqSecret }}
+            items:
+              - key: rabbitmq-username
+                path: username
+              - key: rabbitmq-password
+                path: password
+        - name: influxdb-credentials
+          secret:
+            secretName: {{ .Values.consumer.influxSecret }}
+            items:
+              - key: influxdb-user
+                path: username
+              - key: influxdb-password
+                path: password
+      {{- with .Values.consumer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     {{- with .Values.affinity }}
     affinity:
       {{- toYaml . | nindent 8 }}

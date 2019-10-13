@@ -50,7 +50,7 @@ spec:
           volumeMounts:
             - mountPath: /dev/i2c-1
               name: dev-i2c
-            - name: passwords
+            - name: rabbitmq-credentials
               mountPath: {{ .Values.producer.volume.mountPath }}
           securityContext:
             privileged: true
@@ -60,7 +60,7 @@ spec:
         - name: dev-i2c
           hostPath:
             path: {{ .Values.producer.i2c.path }}
-        - name: passwords
+        - name: rabbitmq-credentials
           secret:
             secretName: {{ .Values.producer.secretName }}
             items:
