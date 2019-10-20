@@ -41,7 +41,7 @@ func createDatabase(client influxdb.Client) {
 	}
 }
 
-func insertPoint(client influxdb.Client, values environment.SensorValues) {
+func insertPoint(client influxdb.Client, values environment.SensorValues) error {
 	tags := map[string]string{}
 	fields := map[string]interface{}{
 		"temperature":	values.Temperature,
@@ -50,16 +50,18 @@ func insertPoint(client influxdb.Client, values environment.SensorValues) {
 	}
 	timestamp, err := time.Parse("20060102150405", values.Timestamp)
 	if err != nil {
-		log.Fatalf("Could not parse timestamp! %v", err)
+		return err
 	}
 
 	points, err := influxdb.NewBatchPoints(sensorBP)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	point, err := influxdb.NewPoint("sensor", tags, fields, timestamp)
 	points.AddPoint(point)
 	if err = client.Write(points);err != nil {
-		log.Fatalf("Could not write to influxdb! %v", err)
+		return err
 	}
+
+	return nil
 }
