@@ -14,5 +14,3 @@
 # IDE
 .idea
 
-# credentials
-cmd/consumer/passwords/*
