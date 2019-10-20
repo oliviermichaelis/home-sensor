@@ -23,7 +23,7 @@ func main() {
 	ctx, done := context.WithCancel(context.Background())
 	go func() {
 		tags := make(chan uint64)
-		subscribe(connect.Redial(ctx, environment.RabbitmqURL(), environment.GetExchange(), environment.GetQueue()), write(client, tags), tags)
+		connect.Subscribe(connect.Redial(ctx, environment.RabbitmqURL(), environment.GetExchange(), environment.GetQueue()), write(client, tags), tags)
 		done()
 	}()
 	<-ctx.Done()

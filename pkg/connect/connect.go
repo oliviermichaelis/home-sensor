@@ -91,3 +91,101 @@ func Redial(ctx context.Context, url string, exchange string, queue string) chan
 
 	return sessions
 }
+
+// Publishes messages over a reconnecting session to a direct exchange.
+// Messages are received over the channel 'messages'
+func Publish(sessions chan chan Session, messages <-chan []byte) {
+	for session := range sessions {
+		var (
+			running bool
+			reading = messages
+			pending = make(chan []byte, 1)
+			confirm = make(chan amqp.Confirmation, 1)
+		)
+
+		pub := <-session
+
+		// publisher confirms for this channel/connection
+		if err := pub.Confirm(false); err != nil {
+			log.Printf("publisher confirms not supported")
+			close(confirm) // confirms not supported, simulate by always nacking
+		} else {
+			pub.NotifyPublish(confirm)
+		}
+
+		log.Printf("publishing...")
+
+	Publish:
+		for {
+			var body []byte
+			select {
+			case confirmed, ok := <-confirm:
+				if !ok {
+					break Publish
+				}
+				if !confirmed.Ack {
+					log.Printf("nack message %d, body: %q", confirmed.DeliveryTag, string(body))
+				}
+				reading = messages
+
+			case body = <-pending:
+				routingKey := "sensor"
+				err := pub.Publish(environment.GetExchange(), routingKey, true, false, amqp.Publishing{
+					Body: body,
+				})
+				// Retry failed delivery on the next session
+				if err != nil {
+					pending <- body
+					if err = pub.Close(); err != nil {
+						log.Fatal(err)
+					}
+					break Publish
+				}
+
+			case body, running = <-reading:
+				// All messages consumed
+				if !running {
+					return
+				}
+				// Work on pending delivery until ack'd
+				pending <- body
+				reading = nil
+			}
+		}
+	}
+}
+
+// Consumes from a queue and sends the message to a channel used by the influxdb writer
+func Subscribe(sessions chan chan Session, messages chan<- amqp.Delivery, tags <-chan uint64) {
+	queue := environment.GetQueue()
+	for session := range sessions {
+		sub := <-session
+
+		if _, err := sub.QueueDeclare(queue, true, false, false, false, nil); err != nil {
+			log.Printf("Cannot consume from exclusive queue: %q, %v", queue, err)
+			return
+		}
+
+		deliveries, err := sub.Consume(queue, "", false, false, false, false, nil)
+		if err != nil {
+			log.Printf("Cannot consume from: %q, %v", queue, err)
+			return
+		}
+
+		log.Printf("subscribed...")
+
+		// Receives DeliveryTag as uint64 from writer and send ack to queue
+		go func() {
+			for tag := range tags {
+				if err = sub.Ack(tag, false); err != nil {
+					log.Fatal(err)
+				}
+			}
+		}()
+
+		// Sends message to writer
+		for msg := range deliveries {
+			messages <- msg
+		}
+	}
+}
