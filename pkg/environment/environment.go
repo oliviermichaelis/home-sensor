@@ -27,7 +27,17 @@ var (
 )
 
 func RabbitmqURL() string {
-	return fmt.Sprintf("amqp://%s:%s@%s:%s/", ReadUsername(rSecret), ReadPassword(rSecret), rURL, rPort)
+	username, err := ReadUsername(rSecret)
+	if err != nil {
+		log.Fatalf("Couldn't read username: %v", err)
+	}
+
+	password, err := ReadUsername(rSecret)
+	if err != nil {
+		log.Fatalf("Couldn't read password: %v", err)
+	}
+
+	return fmt.Sprintf("amqp://%s:%s@%s:%s/", username, password, rURL, rPort)
 }
 
 // Returns the connection URL for the influxdb client
@@ -35,20 +45,14 @@ func InfluxURL() string {
 	return fmt.Sprintf("http://%s:%s", iURL, iPort)
 }
 
-func ReadUsername(secretPath string) string {
+func ReadUsername(secretPath string) (string, error) {
 	u, err := ioutil.ReadFile(secretPath + "/username")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return string(u)
+	return string(u), err
 }
 
-func ReadPassword(secretPath string) string {
+func ReadPassword(secretPath string) (string, error) {
 	p, err := ioutil.ReadFile(secretPath + "/password")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return string(p)
+	return string(p), err
 }
 
 func GetEnv(key, fallback string) string {

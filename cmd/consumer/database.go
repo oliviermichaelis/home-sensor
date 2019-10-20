@@ -15,10 +15,18 @@ var sensorBP = influxdb.BatchPointsConfig {
 }
 
 func setupClient() influxdb.Client {
+	username, err := environment.ReadUsername(environment.ISecret)
+	if err != nil {
+		log.Fatalf("Could not read username for influxdb! %v", err)
+	}
+	password, err := environment.ReadPassword(environment.ISecret)
+	if err != nil {
+		log.Fatalf("Could not read password for influxdb! %v", err)
+	}
 	config := influxdb.HTTPConfig {
 		Addr:               environment.InfluxURL(),
-		Username:           environment.ReadUsername(environment.ISecret),
-		Password:           environment.ReadPassword(environment.ISecret),
+		Username:           username,
+		Password:           password,
 		UserAgent:          "",
 		Timeout:            0,
 		InsecureSkipVerify: false,

@@ -47,6 +47,7 @@ func TestConnect(t *testing.T) {
 	}
 
 	ctx, done := context.WithCancel(context.Background())
+	defer ctx.Done()
 	Publish(Redial(ctx, environment.RabbitmqURL(), environment.GetExchange(), environment.GetQueue()), reader(value))
 	done()
 
