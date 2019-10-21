@@ -9,6 +9,8 @@ jobs:
         environment:
           INFLUXDB_USER: telegraf
           INFLUXDB_USER_PASSWORD: secretpassword
+    environment:
+      - RABBITMQ_SECRET_PATH: /go/src/github.com/oliviermichaelis/home-sensor/test/rabbitmq
     working_directory: /go/src/github.com/oliviermichaelis/home-sensor
     steps:
       - checkout
@@ -21,7 +23,6 @@ jobs:
     environment:
       - IMAGE_NAME_PRODUCER: oliviermichaelis/producer
       - IMAGE_NAME_CONSUMER: oliviermichaelis/consumer
-      - RABBITMQ_SECRET_PATH: /go/src/github.com/oliviermichaelis/home-sensor/test/rabbitmq
     steps:
       - checkout
       - run: |
