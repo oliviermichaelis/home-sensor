@@ -47,7 +47,7 @@ func Redial(ctx context.Context, url string, exchange string, queue string) chan
 					break
 				}
 				duration := time.Duration(i) * 10 * time.Second
-				log.Printf("Attempted to connect to %s unsuccessfully. Retrying in: %v",environment.RabbitmqURL(),  duration)
+				log.Printf("Attempted to connect to %s unsuccessfully. Retrying in: %v", url,  duration)
 				time.Sleep(duration)
 			}
 			if err != nil {
