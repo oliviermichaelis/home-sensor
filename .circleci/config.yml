@@ -21,7 +21,7 @@ jobs:
     environment:
       - IMAGE_NAME_PRODUCER: oliviermichaelis/producer
       - IMAGE_NAME_CONSUMER: oliviermichaelis/consumer
-      - RABBITMQ_SECRET_PATH: test/rabbitmq
+      - RABBITMQ_SECRET_PATH: /go/src/github.com/oliviermichaelis/home-sensor/test/rabbitmq
     steps:
       - checkout
       - run: |
