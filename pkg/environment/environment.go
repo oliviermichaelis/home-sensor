@@ -31,11 +31,13 @@ var (
 func RabbitmqURL() string {
 	log.Printf("rSecret: %s", rSecret)
 	username, err := ReadUsername(rSecret)
+	log.Printf("user: %s", username)
 	if err != nil {
 		log.Fatalf("Couldn't read username: %v", err)
 	}
 
 	password, err := ReadUsername(rSecret)
+	log.Printf("pass: %s", password)
 	if err != nil {
 		log.Fatalf("Couldn't read password: %v", err)
 	}
