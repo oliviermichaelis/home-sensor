@@ -5,7 +5,7 @@
 producer:
   image:
     repository: oliviermichaelis/producer
-    tag: 0.56
+    tag: 0.65
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1
@@ -28,7 +28,7 @@ producer:
 consumer:
   image:
     repository: oliviermichaelis/consumer
-    tag: 0.56
+    tag: 0.65
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1
@@ -38,7 +38,7 @@ consumer:
     RABBITMQ_QUEUE: sensor
     RABBITMQ_EXCHANGE: sensor
     RABBITMQ_SECRET_PATH: /credentials/rabbit
-    INFLUX_SERVICE_URL: influxdb.default
+    INFLUX_SERVICE_URL: influxdb.default.svc.cluster.local
     INFLUX_SERVICE_PORT: 8086
     INFLUX_SECRET_PATH: /credentials/influx
   influxSecret: influxdb-auth
@@ -68,7 +68,7 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources: {}
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -76,9 +76,9 @@ resources: {}
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 16Mi
 
 
 
