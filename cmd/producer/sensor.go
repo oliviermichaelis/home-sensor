@@ -13,7 +13,11 @@ import (
 
 var sensor *bsbmp.BMP
 
-func setupSensor() {
+func setupSensor() *i2c.I2C {
+	if environment.Debug {
+		return &i2c.I2C{}
+	}
+
 	// Change loglevel of packages to omit debug output
 	if err := logger.ChangePackageLogLevel("i2c", logger.WarnLevel); err != nil {
 		log.Fatal(err)
@@ -36,10 +40,16 @@ func setupSensor() {
 	if err = sensor.IsValidCoefficients(); err != nil {
 		log.Fatal(err)
 	}
+
+	return connection
 }
 
 // Read temperature in celsius degree
 func readTemperature() float64 {
+	if environment.Debug {
+		return round(20.0)
+	}
+
 	t, err := sensor.ReadTemperatureC(bsbmp.ACCURACY_HIGH)
 	if err != nil {
 		log.Fatalf("Could not read temperature!\n%v", err)
@@ -49,6 +59,10 @@ func readTemperature() float64 {
 
 // Read humidity in percent
 func readHumidity() float64 {
+	if environment.Debug {
+		return round(50.0)
+	}
+
 	supported, h, err := sensor.ReadHumidityRH(bsbmp.ACCURACY_HIGH)
 	if err != nil {
 		log.Fatalf("Could not read temperature!\n%v", err)
@@ -60,6 +74,10 @@ func readHumidity() float64 {
 
 // Read Pressure in pascal
 func readPressure() float64 {
+	if environment.Debug {
+		return round(100005.0)
+	}
+
 	p, err := sensor.ReadPressurePa(bsbmp.ACCURACY_LOW)
 	if err != nil {
 		log.Fatalf("Could not read Pressure!\n%v", err)

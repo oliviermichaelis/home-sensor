@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 )
 
 type SensorValues struct {
@@ -20,13 +21,15 @@ var (
 	rPort    = GetEnv("RABBITMQ_SERVICE_PORT", "5672")
 	queue    = GetEnv("RABBITMQ_QUEUE", "sensor")
 	exchange = GetEnv("RABBITMQ_EXCHANGE", "sensor")
-	rSecret  = GetEnv("RABBITMQ_SECRET_PATH", "/credentials/rabbit")
+	rSecret  = GetEnv("RABBITMQ_SECRET_PATH", "/credentials/rabbitmq")
 	iURL     = GetEnv("INFLUX_SERVICE_URL", "localhost")
 	iPort    = GetEnv("INFLUX_SERVICE_PORT", "8086")
 	ISecret  = GetEnv("INFLUX_SECRET_PATH", "/credentials/influx")
+	Debug,_	 = strconv.ParseBool(GetEnv("DEBUG", "false"))
 )
 
 func RabbitmqURL() string {
+	log.Printf("rSecret: %s", rSecret)
 	username, err := ReadUsername(rSecret)
 	if err != nil {
 		log.Fatalf("Couldn't read username: %v", err)

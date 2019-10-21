@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/d2r2/go-i2c"
 	"github.com/oliviermichaelis/home-sensor/pkg/connect"
 	"github.com/oliviermichaelis/home-sensor/pkg/environment"
+	"github.com/oliviermichaelis/home-sensor/pkg/healthcheck"
 	"time"
 )
 
@@ -16,12 +16,13 @@ var (
 	i2cBus = flag.Int("i2c-bus", 1, "I2C connection bus line")
 )
 
-var connection i2c.I2C
-
 func main() {
 	flag.Parse()
-	setupSensor()
+	connection := setupSensor()
 	defer connection.Close()
+
+	// Start HTTP Server for healthchecks
+	healthcheck.Server()
 
 	// Start publishing messages
 	ctx, done := context.WithCancel(context.Background())
