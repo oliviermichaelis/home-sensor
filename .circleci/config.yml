@@ -11,6 +11,8 @@ jobs:
           INFLUXDB_USER_PASSWORD: secretpassword
     environment:
       - RABBITMQ_SECRET_PATH: /go/src/github.com/oliviermichaelis/home-sensor/test/rabbitmq
+      - INFLUX_SECRET_PATH: /go/src/github.com/oliviermichaelis/home-sensor/test/influxdb
+      - RABBITMQ_SERVICE_URL: localhost
     working_directory: /go/src/github.com/oliviermichaelis/home-sensor
     steps:
       - checkout
