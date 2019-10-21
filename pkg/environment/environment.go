@@ -56,6 +56,12 @@ func ReadUsername(secretPath string) (string, error) {
 }
 
 func ReadPassword(secretPath string) (string, error) {
+	log.Println("Testing!")
+	t1, err := ioutil.ReadFile(secretPath + "/password")
+	log.Printf("t1: %s", t1)
+	t2, err := ioutil.ReadFile("/credentials/rabbitmq/password")
+	log.Printf("t2: %s", t2)
+
 	p, err := ioutil.ReadFile(secretPath + "/password")
 	return string(p), err
 }
