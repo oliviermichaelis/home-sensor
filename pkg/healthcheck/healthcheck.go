@@ -106,6 +106,6 @@ func Server(service int) {
 	log.Println("Starting healthcheck endpoint")
 	http.HandleFunc("/health", healthHandler)
 	go func() {
-		log.Fatal(http.ListenAndServe(":8080", nil))
+		log.Fatal(http.ListenAndServe(":80", nil))
 	}()
 }

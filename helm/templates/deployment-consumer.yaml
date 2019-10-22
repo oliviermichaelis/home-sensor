@@ -41,18 +41,18 @@ spec:
               value: {{ .Values.consumer.env.INFLUX_SERVICE_PORT | quote }}
             - name: INFLUX_SECRET_PATH
               value: {{ .Values.consumer.volume.mountPathInflux | quote }}
-          #          ports:
-          #            - name: http
-          #              containerPort: 80
-          #              protocol: TCP
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
           #          livenessProbe:
           #            httpGet:
           #              path: /
           #              port: http
-          #          readinessProbe:
-          #            httpGet:
-          #              path: /
-          #              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
           volumeMounts:
             - name: influxdb-credentials
               mountPath: {{ .Values.consumer.volume.mountPathInflux }}
