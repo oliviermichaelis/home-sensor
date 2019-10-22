@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// Main struct that holds the measured values
 type SensorValues struct {
 	Timestamp 	string
 	Temperature float64
@@ -47,16 +48,19 @@ func InfluxURL() string {
 	return fmt.Sprintf("http://%s:%s", iURL, iPort)
 }
 
+// Returns the username read from a 'username' file under the specified parameter
 func ReadUsername(secretPath string) (string, error) {
 	u, err := ioutil.ReadFile(secretPath + "/username")
 	return string(u), err
 }
 
+// Returns the password read from a 'password' file under the specified parameter
 func ReadPassword(secretPath string) (string, error) {
 	p, err := ioutil.ReadFile(secretPath + "/password")
 	return string(p), err
 }
 
+// Returns an environment variable if it exists, else it returns a fallback variable passed as parameter
 func GetEnv(key, fallback string) string {
 	value, exists := os.LookupEnv(key)
 	if !exists {

@@ -14,6 +14,7 @@ var sensorBP = influxdb.BatchPointsConfig {
 	WriteConsistency: "",
 }
 
+// Sets up a infludcb client
 func setupClient() influxdb.Client {
 	username, err := environment.ReadUsername(environment.ISecret)
 	if err != nil {
@@ -38,10 +39,12 @@ func setupClient() influxdb.Client {
 	if err != nil {
 		log.Fatalf("Could not instantiate influxdb client! %v", err)
 	}
-	log.Printf("Connected successfully to %s", config.Addr)
+	log.Printf("Successfully setup influxdb client to %s", config.Addr)
 	return client
 }
 
+// This function tries to create a database in case it doesn't exist yet.
+// That's also the first time the client actually connects to the database.
 func createDatabase(client influxdb.Client) {
 	query := influxdb.NewQuery("CREATE DATABASE sensor", "", "")
 	if response, err := client.Query(query); err != nil || response.Error() != nil {
@@ -49,6 +52,7 @@ func createDatabase(client influxdb.Client) {
 	}
 }
 
+// Inserts a single timeseries point into the database
 func insertPoint(client influxdb.Client, values environment.SensorValues) error {
 	tags := map[string]string{}
 	fields := map[string]interface{}{
