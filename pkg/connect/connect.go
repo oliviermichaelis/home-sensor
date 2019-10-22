@@ -3,6 +3,7 @@ package connect
 import (
 	"context"
 	"github.com/oliviermichaelis/home-sensor/pkg/environment"
+	"github.com/oliviermichaelis/home-sensor/pkg/healthcheck"
 	"github.com/streadway/amqp"
 	"log"
 	"time"
@@ -53,14 +54,8 @@ func Redial(ctx context.Context, url string, exchange string, queue string) chan
 			if err != nil {
 				log.Fatalf("Cannot create channel: %v", err)
 			}
-			log.Printf("Connected successfully to %s", url)
 
-			/*
-				conn, err := amqp.Dial(url)
-				if err != nil {
-					log.Fatalf("cannot (re)dial: %v: %q", err, url)
-				}
-			*/
+			log.Printf("Connected successfully to %s", url)
 
 			ch, err := conn.Channel()
 			if err != nil {
@@ -86,6 +81,9 @@ func Redial(ctx context.Context, url string, exchange string, queue string) chan
 				log.Println("shutting down new session")
 				return
 			}
+
+			// Set service status to successful
+			healthcheck.Health.SetStatus(healthcheck.ServiceRabbitMQ, true)
 		}
 	}()
 

@@ -29,15 +29,12 @@ var (
 )
 
 func RabbitmqURL() string {
-	//log.Printf("rSecret: %s", rSecret)
 	username, err := ReadUsername(rSecret)
-	//log.Printf("user: %s", username)
 	if err != nil {
 		log.Fatalf("Couldn't read username: %v", err)
 	}
 
 	password, err := ReadPassword(rSecret)
-	//log.Printf("pass: %s", password)
 	if err != nil {
 		log.Fatalf("Couldn't read password: %v", err)
 	}
@@ -56,16 +53,6 @@ func ReadUsername(secretPath string) (string, error) {
 }
 
 func ReadPassword(secretPath string) (string, error) {
-	//log.Println("Testing!")
-	//t1, err := ioutil.ReadFile(secretPath + "/password")
-	//log.Printf("t1: %s", t1)
-	//t2, err := ioutil.ReadFile("/credentials/rabbitmq/password")
-	//log.Printf("t2: %s", t2)
-	//path := secretPath + "/password"
-	//log.Println("t3 path: ", path)
-	//t3, err := ioutil.ReadFile(path)
-	//log.Printf("t3: %s", t3)
-
 	p, err := ioutil.ReadFile(secretPath + "/password")
 	return string(p), err
 }

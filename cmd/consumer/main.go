@@ -7,6 +7,7 @@ import (
 	influxdb "github.com/influxdata/influxdb1-client/v2"
 	"github.com/oliviermichaelis/home-sensor/pkg/connect"
 	"github.com/oliviermichaelis/home-sensor/pkg/environment"
+	"github.com/oliviermichaelis/home-sensor/pkg/healthcheck"
 	"github.com/streadway/amqp"
 	"log"
 )
@@ -16,8 +17,12 @@ func main() {
 
 	// Connect to influxdb
 	client := setupClient()
+	healthcheck.Health.SetStatus(healthcheck.ServiceInfluxDB, true)
 	defer client.Close()
 	createDatabase(client)
+
+	// Start HTTP Server for healthchecks
+	healthcheck.Server(healthcheck.Consumer)
 
 	// Start consuming messages
 	ctx, done := context.WithCancel(context.Background())

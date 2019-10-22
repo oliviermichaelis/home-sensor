@@ -22,7 +22,7 @@ func main() {
 	defer connection.Close()
 
 	// Start HTTP Server for healthchecks
-	healthcheck.Server()
+	healthcheck.Server(healthcheck.Producer)
 
 	// Start publishing messages
 	ctx, done := context.WithCancel(context.Background())

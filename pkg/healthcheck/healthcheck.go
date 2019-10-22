@@ -4,28 +4,87 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sync"
 )
 
-type Health struct {
+const ServiceRabbitMQ = "rabbitmq"
+const ServiceInfluxDB = "influxdb"
+const statusPass = "pass"
+const statusFail = "fail"
+const statusWarn = "warn"
+const Producer = 0
+const Consumer = 1
+
+var Health = health{Status: "fail", Details: []service{},}
+var isConsumer = true
+
+type health struct {
+	sync.RWMutex
 	Status string
+	Details []service
 }
 
-func (h Health) SetPass() {
-	status.Status = "pass"
+type service struct {
+	Name string
+	Status bool
 }
 
-func (h Health) SetWarn() {
-	status.Status = "warn"
+func (h *health) setPass() {
+	h.Status = statusPass
 }
 
-func (h Health) SetFail() {
-	status.Status = "fail"
+func (h *health) setWarn() {
+	h.Status = statusWarn
 }
 
-var status = Health{Status: "fail"}
+func (h *health) setFail() {
+	h.Status = statusFail
+}
+
+func (h *health) checkStatus() {
+	rStatus, iStatus := false, false
+	for _, service := range h.Details {
+		if service.Name == ServiceRabbitMQ {
+			rStatus = service.Status
+		} else if service.Name == ServiceInfluxDB {
+			iStatus = service.Status
+		}
+	}
+
+	// The variable isConsumer is set when the Server is started. If it's the Producer, only rStatus needs to be true
+	// for the expression to be evaluated to true
+	if rStatus && (!isConsumer || iStatus) {
+		h.setPass()
+	} else {
+		h.setFail()
+	}
+}
+
+func (h *health) SetStatus(serviceName string, status bool) {
+	h.Lock()
+	defer h.Unlock()
+	for _, service := range h.Details {
+		if service.Name == serviceName {
+			service.Status = status
+			h.checkStatus()
+			break
+		}
+	}
+
+	h.Details = append(h.Details, service{
+		Name:   serviceName,
+		Status: status,
+	})
+	h.checkStatus()
+}
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
-	j, err := json.Marshal(status)
+	Health.Lock()
+	j, err := json.Marshal(Health)
+	if Health.Status == statusFail {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	Health.Unlock()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -39,10 +98,14 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Server() {
+func Server(service int) {
+	if service == Producer {
+		isConsumer = false
+	}
+
 	log.Println("Starting healthcheck endpoint")
 	http.HandleFunc("/health", healthHandler)
 	go func() {
-		log.Fatal(http.ListenAndServe(":80", nil))
+		log.Fatal(http.ListenAndServe(":8080", nil))
 	}()
 }
