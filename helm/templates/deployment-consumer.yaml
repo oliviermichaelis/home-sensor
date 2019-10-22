@@ -25,10 +25,22 @@ spec:
           image: "{{ .Values.consumer.image.repository }}:{{ .Values.consumer.image.tag }}"
           imagePullPolicy: {{ .Values.consumer.image.pullPolicy }}
           env:
+            - name: RABBITMQ_SERVICE_URL
+              value: {{ .Values.consumer.env.RABBITMQ_SERVICE_URL | quote }}
+            - name: RABBITMQ_SERVICE_PORT
+              value: {{ .Values.consumer.env.RABBITMQ_SERVICE_PORT | quote }}
+            - name: RABBITMQ_QUEUE
+              value: {{ .Values.consumer.env.RABBITMQ_QUEUE | quote }}
+            - name: RABBITMQ_EXCHANGE
+              value: {{ .Values.consumer.env.RABBITMQ_EXCHANGE | quote }}
+            - name: RABBITMQ_SECRET_PATH
+              value: {{ .Values.consumer.volume.mountPathRabbit | quote }}
             - name: INFLUX_SERVICE_URL
               value: {{ .Values.consumer.env.INFLUX_SERVICE_URL | quote }}
             - name: INFLUX_SERVICE_PORT
               value: {{ .Values.consumer.env.INFLUX_SERVICE_PORT | quote }}
+            - name: INFLUX_SECRET_PATH
+              value: {{ .Values.consumer.volume.mountPathInflux | quote }}
           #          ports:
           #            - name: http
           #              containerPort: 80
