@@ -11,6 +11,7 @@ import (
 // Main struct that holds the measured values
 type SensorValues struct {
 	Timestamp 	string
+	Station		string
 	Temperature float64
 	Humidity    float64
 	Pressure    float64
@@ -27,6 +28,7 @@ var (
 	iPort    = GetEnv("INFLUX_SERVICE_PORT", "8086")
 	ISecret  = GetEnv("INFLUX_SECRET_PATH", "/credentials/influx")
 	Debug,_	 = strconv.ParseBool(GetEnv("DEBUG", "false"))
+	Station  = GetEnv("STATION_ID", "")
 )
 
 func RabbitmqURL() string {

@@ -88,6 +88,7 @@ func readPressure() float64 {
 func readSensor() environment.SensorValues {
 	values := environment.SensorValues{
 		Timestamp: 	 	time.Now().UTC().Format("20060102150405"),
+		Station:		environment.Station,
 		Temperature: 	readTemperature(),
 		Humidity:		readHumidity(),
 		Pressure:		readPressure(),
