@@ -5,7 +5,7 @@
 producer:
   image:
     repository: oliviermichaelis/producer
-    tag: 0.79
+    tag: 0.94
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1
@@ -28,7 +28,7 @@ producer:
 consumer:
   image:
     repository: oliviermichaelis/consumer
-    tag: 0.79
+    tag: 0.96
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1

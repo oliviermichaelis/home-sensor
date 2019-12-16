@@ -54,7 +54,9 @@ func createDatabase(client influxdb.Client) {
 
 // Inserts a single timeseries point into the database
 func insertPoint(client influxdb.Client, values environment.SensorValues) error {
-	tags := map[string]string{}
+	tags := map[string]string{
+		"station": values.Station,
+	}
 	fields := map[string]interface{}{
 		"temperature":	values.Temperature,
 		"humidity":		values.Humidity,
