@@ -31,7 +31,7 @@ jobs:
           sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
           sudo apt-get update
       - run: |
-          sudo apt-get install docker-ce=5:19.03.3~3-0~ubuntu-xenial docker-ce-cli=5:19.03.3~3-0~ubuntu-xenial qemu-user-static
+          sudo apt-get install docker-ce=5:19.03.3~3-0~ubuntu-xenial docker-ce-cli=5:19.03.3~3-0~ubuntu-xenial qemu-user-static i2c-tools
           docker version
           mkdir -p ~/.docker/cli-plugins
           wget https://github.com/docker/buildx/releases/download/v0.3.1/buildx-v0.3.1.linux-amd64

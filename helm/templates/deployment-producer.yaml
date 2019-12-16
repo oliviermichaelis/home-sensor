@@ -35,6 +35,10 @@ spec:
               value: {{ .Values.producer.env.RABBITMQ_EXCHANGE | quote }}
             - name: RABBITMQ_SECRET_PATH
               value: {{ .Values.producer.volume.mountPath | quote }}
+            - name: STATION_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           ports:
             - name: http
               containerPort: 8080
