@@ -9,11 +9,11 @@ import datetime
 
 @dataclasses.dataclass
 class SensorValues:
-    timestamp:      str
-    station:        str
-    temperature:    float
-    humidity:       float
-    pressure:       float
+    Timestamp:      str
+    Station:        str
+    Temperature:    float
+    Humidity:       float
+    Pressure:       float
 
 
 def get_environment(variable: str, default: str) -> str:
@@ -61,11 +61,11 @@ def parse_values(values: dict):
         return None
 
     # timestamp = datetime.datetime.strptime(str(body["datetime"]), "%Y%m%d%H%M")
-    return SensorValues(timestamp=values["datetime"],
-                        station=values["station_id"],
-                        temperature=values["airtemp_temperature_200"],
-                        humidity=values["airtemp_humidity"],
-                        pressure=values["airtemp_pressure_station"])
+    return SensorValues(Timestamp=str(values["datetime"]) + "00",    # this is needed for minutes
+                        Station=values["station_id"],
+                        Temperature=values["airtemp_temperature_200"],
+                        Humidity=values["airtemp_humidity"],
+                        Pressure=values["airtemp_pressure_station"])
 
 
 def publish(rabbit_channel, exchange: str, value: SensorValues):
@@ -76,8 +76,8 @@ def publish(rabbit_channel, exchange: str, value: SensorValues):
         def default(self, o):
             if dataclasses.is_dataclass(o):
                 converted = dataclasses.asdict(o)
-                converted["station"] = str(converted["station"])
-                converted["timestamp"] = str(converted["timestamp"])
+                converted["Station"] = str(converted["Station"])
+                converted["Timestamp"] = str(converted["Timestamp"])
                 return converted
             return super().default(o)
 
@@ -106,7 +106,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
 
-    for measurement in retrieve_data():
-        publish(None, "", parse_values(measurement))
+    # for measurement in retrieve_data():
+    #     publish(None, "", parse_values(measurement))

@@ -6,6 +6,7 @@ metadata:
 {{ include "helm.labels" . | indent 4 }}
 spec:
   schedule: "*/10 * * * *"
+  ttlSecondsAfterFinished: 300
 #  selector:
 #    matchLabels:
 #    app.kubernetes.io/name: {{ include "helm.name" . }}

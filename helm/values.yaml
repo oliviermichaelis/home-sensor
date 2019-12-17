@@ -41,7 +41,7 @@ consumer:
 dwd:
   image:
     repository: oliviermichaelis/dwd
-    tag: 0.98
+    tag: "0.100"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1
