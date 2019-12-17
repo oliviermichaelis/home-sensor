@@ -43,7 +43,7 @@ jobs:
           docker buildx create --name multiarch --platform linux/amd64,linux/arm/v7
           docker buildx use multiarch
       - run: |
-          TAG=0.$CIRCLE_BUILD_NUM
+          TAG=0.0.$CIRCLE_BUILD_NUM
           docker login -u $DOCKER_USER -p $DOCKER_PASS
           docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_PRODUCER:$TAG --push -f cmd/producer/Dockerfile .
           docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_CONSUMER:$TAG --push -f cmd/consumer/Dockerfile .
