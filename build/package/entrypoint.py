@@ -66,27 +66,32 @@ def parse_values(values: dict):
                         pressure=values["airtemp_pressure_station"])
 
 
-def publish(rabbit_channel, value: SensorValues):
+def publish(rabbit_channel, exchange: str, value: SensorValues):
     if value is None:
         return
 
     body_json = json.dumps(dataclasses.asdict(value))
-    rabbit_channel.basic_publish(exchange="sensor", body=body_json)
+    rabbit_channel.basic_publish(exchange=exchange, routing_key="sensor", body=body_json)
 
 
-rabbit_url = get_environment("RABBITMQ_SERVICE_URL", "rabbitmq-ha.default.svc.cluster.local")
-rabbit_port = int(get_environment("RABBITMQ_SERVICE_PORT", "5672"))
-rabbit_queue = get_environment("RABBITMQ_QUEUE", "sensor")
-rabbit_exchange = get_environment("RABBITMQ_EXCHANGE", "sensor")
-rabbit_secret = get_environment("RABBITMQ_SECRET_PATH", "/credentials/rabbitmq")
+def main():
+    rabbit_url = get_environment("RABBITMQ_SERVICE_URL", "rabbitmq-ha.default.svc.cluster.local")
+    rabbit_port = int(get_environment("RABBITMQ_SERVICE_PORT", "5672"))
+    rabbit_queue = get_environment("RABBITMQ_QUEUE", "sensor")
+    rabbit_exchange = get_environment("RABBITMQ_EXCHANGE", "sensor")
+    rabbit_secret = get_environment("RABBITMQ_SECRET_PATH", "/credentials/rabbitmq")
 
-parameters = pika.ConnectionParameters(host=rabbit_url, port=rabbit_port, credentials=retrieve_credentials(rabbit_secret))
-print(parameters)
-connection = pika.BlockingConnection(parameters=parameters)
+    parameters = pika.ConnectionParameters(host=rabbit_url,
+                                           port=rabbit_port,
+                                           credentials=retrieve_credentials(rabbit_secret))
+    connection = pika.BlockingConnection(parameters=parameters)
+    channel = connection.channel()
 
-channel = connection.channel()
+    for measurement in retrieve_data():
+        publish(channel, rabbit_exchange, parse_values(measurement))
 
-for measurement in retrieve_data():
-    publish(channel, parse_values(measurement))
+    connection.close()
 
-connection.close()
+
+if __name__ == "__main__":
+    main()
