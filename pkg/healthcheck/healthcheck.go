@@ -88,7 +88,7 @@ func (h *health) SetStatus(serviceName string, status bool) {
 	h.checkStatus()
 }
 
-// The server is going to respond with a 200 http code if all services are up, otherwise with a 404[]
+// The server is going to respond with a 200 http code if all services are up, otherwise with a 404
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	Health.Lock()
 	j, err := json.Marshal(Health)
