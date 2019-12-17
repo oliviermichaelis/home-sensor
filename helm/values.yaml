@@ -11,12 +11,6 @@ producer:
   replicaCount: 1
   i2c:
     path: /dev/i2c-1
-  env:
-    RABBITMQ_SERVICE_URL: rabbitmq-ha.default.svc.cluster.local
-    RABBITMQ_SERVICE_PORT: 5672
-    RABBITMQ_QUEUE: sensor
-    RABBITMQ_EXCHANGE: sensor
-    RABBITMQ_SECRET_PATH: /credentials/rabbitmq
   secretName: rabbitmq-ha
   volume:
     mountPath: /credentials/rabbitmq
@@ -33,10 +27,6 @@ consumer:
     imagePullSecrets: []
   replicaCount: 1
   env:
-    RABBITMQ_SERVICE_URL: rabbitmq-ha.default.svc.cluster.local
-    RABBITMQ_SERVICE_PORT: 5672
-    RABBITMQ_QUEUE: sensor
-    RABBITMQ_EXCHANGE: sensor
     INFLUX_SERVICE_URL: influxdb.default.svc.cluster.local
     INFLUX_SERVICE_PORT: 8086
   influxSecret: influxdb-auth
@@ -47,6 +37,28 @@ consumer:
   nameOverride: ""
   fullnameOverride: ""
   nodeSelector: {}
+
+dwd:
+  image:
+    repository: oliviermichaelis/dwd
+    tag: 0.98
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
+  replicaCount: 1
+  secretName: rabbitmq-ha
+  volume:
+    mountPath: /credentials/rabbitmq
+  nameOverride: ""
+  fullnameOverride: ""
+  env:
+    STATION_ID: 443
+
+rabbitmq:
+  RABBITMQ_SERVICE_URL: rabbitmq-ha.default.svc.cluster.local
+  RABBITMQ_SERVICE_PORT: 5672
+  RABBITMQ_QUEUE: sensor
+  RABBITMQ_EXCHANGE: sensor
+#  RABBITMQ_SECRET_PATH: /credentials/rabbitmq
 
 service:
   type: ClusterIP

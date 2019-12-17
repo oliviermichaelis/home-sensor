@@ -26,13 +26,13 @@ spec:
           imagePullPolicy: {{ .Values.producer.image.pullPolicy }}
           env:
             - name: RABBITMQ_SERVICE_URL
-              value: {{ .Values.producer.env.RABBITMQ_SERVICE_URL | quote }}
+              value: {{ .Values.rabbitmq.RABBITMQ_SERVICE_URL | quote }}
             - name: RABBITMQ_SERVICE_PORT
-              value: {{ .Values.producer.env.RABBITMQ_SERVICE_PORT | quote }}
+              value: {{ .Values.rabbitmq.RABBITMQ_SERVICE_PORT | quote }}
             - name: RABBITMQ_QUEUE
-              value: {{ .Values.producer.env.RABBITMQ_QUEUE | quote }}
+              value: {{ .Values.rabbitmq.RABBITMQ_QUEUE | quote }}
             - name: RABBITMQ_EXCHANGE
-              value: {{ .Values.producer.env.RABBITMQ_EXCHANGE | quote }}
+              value: {{ .Values.rabbitmq.RABBITMQ_EXCHANGE | quote }}
             - name: RABBITMQ_SECRET_PATH
               value: {{ .Values.producer.volume.mountPath | quote }}
             - name: STATION_ID
