@@ -9,11 +9,11 @@ import datetime
 
 @dataclasses.dataclass
 class SensorValues:
-    timestamp:  str
-    station:    str
-    temperature: float
-    humidity:    float
-    pressure:    float
+    timestamp:      str
+    station:        str
+    temperature:    float
+    humidity:       float
+    pressure:       float
 
 
 def get_environment(variable: str, default: str) -> str:
@@ -51,6 +51,8 @@ def retrieve_data() -> list:
         time += delta
         result = client.query(station_id=433, timestamp=time)
 
+    print("Retrieved %d measurements", len(results))
+
     return results
 
 
@@ -70,7 +72,17 @@ def publish(rabbit_channel, exchange: str, value: SensorValues):
     if value is None:
         return
 
-    body_json = json.dumps(dataclasses.asdict(value))
+    class GoodEncoder(json.JSONEncoder):
+        def default(self, o):
+            if dataclasses.is_dataclass(o):
+                converted = dataclasses.asdict(o)
+                converted["station"] = str(converted["station"])
+                converted["timestamp"] = str(converted["timestamp"])
+                return converted
+            return super().default(o)
+
+    # body_json = json.dumps(dataclasses.asdict(value))
+    body_json = json.dumps(value, cls=GoodEncoder)
     rabbit_channel.basic_publish(exchange=exchange, routing_key="sensor", body=body_json)
 
 
@@ -94,4 +106,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+
+    for measurement in retrieve_data():
+        publish(None, "", parse_values(measurement))
