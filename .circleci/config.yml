@@ -47,7 +47,7 @@ jobs:
           docker login -u $DOCKER_USER -p $DOCKER_PASS
           docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_PRODUCER:$TAG --push -f cmd/producer/Dockerfile .
           docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_CONSUMER:$TAG --push -f cmd/consumer/Dockerfile .
-          docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_DWD:$TAG --push -f build/package/Dockerfile .
+          docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_DWD:$TAG --push -f scripts/Dockerfile .
 workflows:
   version: 2
   build-test-push:

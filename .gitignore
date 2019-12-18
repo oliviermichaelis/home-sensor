@@ -7,8 +7,8 @@
 
 # Test binary, build with `go test -c`
 *.test
-build/package/password
-build/package/username
+scripts/password
+scripts/username
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out

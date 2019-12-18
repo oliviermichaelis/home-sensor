@@ -6,6 +6,6 @@ RUN addgroup -S producer && adduser -S producer -G producer
 USER producer
 
 WORKDIR /app
-COPY build/package/entrypoint.py /app/
+COPY scripts/entrypoint.py /app/
 
 CMD python /app/entrypoint.py
