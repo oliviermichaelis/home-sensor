@@ -41,7 +41,8 @@ def retrieve_data() -> list:
     # Create timestamp and floor to multiples of 10 min.
     # The time is decreased by an hour to make sure data is available.
     time = datetime.datetime.utcnow()
-    time = datetime.datetime(time.year, time.month, time.day, time.hour - 2, time.minute - (time.minute % 10))
+    delta = datetime.timedelta(hours=2)
+    time = datetime.datetime(time.year, time.month, time.day, time.hour, time.minute - (time.minute % 10)) - delta
 
     results = []
     result = client.query(station_id=433, timestamp=time)
