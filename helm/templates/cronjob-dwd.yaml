@@ -3,14 +3,14 @@ kind: CronJob
 metadata:
   name: {{ include "helm.fullname" . }}-dwd
   labels:
-{{ include "helm.labels" . | indent 4 }}
+  {{ include "helm.labels" . | indent 4 }}
 spec:
   schedule: "*/10 * * * *"
   ttlSecondsAfterFinished: 300
-#  selector:
-#    matchLabels:
-#    app.kubernetes.io/name: {{ include "helm.name" . }}
-#    app.kubernetes.io/instance: {{ .Release.Name }}
+  selector:
+    matchLabels:
+    app.kubernetes.io/name: {{ include "helm.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
   jobTemplate:
     spec:
       template:

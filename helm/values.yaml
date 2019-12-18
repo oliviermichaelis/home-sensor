@@ -58,7 +58,6 @@ rabbitmq:
   RABBITMQ_SERVICE_PORT: 5672
   RABBITMQ_QUEUE: sensor
   RABBITMQ_EXCHANGE: sensor
-#  RABBITMQ_SECRET_PATH: /credentials/rabbitmq
 
 service:
   type: ClusterIP
