@@ -39,6 +39,7 @@ func writer(received chan<- environment.SensorValues, tags chan<- uint64) chan<-
 }
 
 func TestConnect(t *testing.T) {
+	//TODO add Station field
 	value := environment.SensorValues{
 		Timestamp:   "20060102150405",
 		Temperature: 20.28,

@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
 // Main struct that holds the measured values
@@ -30,6 +31,34 @@ var (
 	Debug,_	 = strconv.ParseBool(GetEnv("DEBUG", "false"))
 	Station  = GetEnv("STATION_ID", "")
 )
+
+func (s SensorValues) IsValid() bool {
+	if s == (SensorValues{}) {
+		return false
+	}
+
+	if _, err := time.Parse("20060102150405", s.Timestamp); err != nil {
+		return false
+	}
+
+	if s.Station == "" {
+		return false
+	}
+
+	if -40.0 > s.Temperature || 100.0 < s.Temperature {
+		return false
+	}
+
+	if -0.1 > s.Humidity || s.Humidity > 100.0 {
+		return false
+	}
+
+	if 0.0 > s.Pressure {
+		return false
+	}
+
+	return true
+}
 
 func RabbitmqURL() string {
 	username, err := ReadUsername(rSecret)
