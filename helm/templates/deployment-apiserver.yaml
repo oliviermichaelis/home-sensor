@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "helm.fullname" . }}-apiserver
+  labels:
+{{ include "helm.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.apiserver.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "helm.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "helm.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.apiserver.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.tag }}"
+          imagePullPolicy: {{ .Values.apiserver.image.pullPolicy }}
+          env:
+            - name: INFLUX_SERVICE_URL
+              value: {{ .Values.apiserver.env.INFLUX_SERVICE_URL | quote }}
+            - name: INFLUX_SERVICE_PORT
+              value: {{ .Values.apiserver.env.INFLUX_SERVICE_PORT | quote }}
+            - name: INFLUX_SECRET_PATH
+              value: {{ .Values.apiserver.volume.mountPathInflux | quote }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          #          livenessProbe:
+          #            httpGet:
+          #              path: /
+          #              port: http
+#          readinessProbe:
+#            httpGet:
+#              path: /health
+#              port: http
+          volumeMounts:
+            - name: influxdb-credentials
+              mountPath: {{ .Values.apiserver.volume.mountPathInflux }}
+          securityContext:
+            privileged: false
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: influxdb-credentials
+          secret:
+            secretName: {{ .Values.apiserver.influxSecret }}
+            items:
+              - key: influxdb-user
+                path: username
+              - key: influxdb-password
+                path: password
+      {{- with .Values.apiserver.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+    affinity:
+      {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+    tolerations:
+      {{- toYaml . | nindent 8 }}
+    {{- end }}
