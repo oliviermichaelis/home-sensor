@@ -40,6 +40,7 @@ func errorHandler(w http.ResponseWriter, r *http.Request, status int) {
 	}
 }
 
+// Handles the /measurements/climate endpoint. Validates data and sends it to the goroutine handling the db insertion
 func climateHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		errorHandler(w, r, http.StatusMethodNotAllowed)
@@ -59,15 +60,22 @@ func climateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// validate the measurement struct
+	// Validate data in measurement struct
 	if !measurement.IsValid() {
 		errorHandler(w, r, http.StatusBadRequest)
 		return
 	}
 
-	// TODO use channel to send content to other goroutine which handles buffer.
-	// Buffer could be queue of items with corresponding timeout. If item can't be delivered after 60min
-	// the buffer controller should delete the message. If message delivery fails before timeout, the message
-	// should be added to the tail.
+	// Send measurement to buffered channel which is consumed by readMeasurements()
+	measurements <- measurement
 
+	if _, err = w.Write(body); err != nil {
+		errorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
+}
+
+func setupServer() {
+	http.HandleFunc("/measurements/climate", climateHandler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

@@ -1,21 +1,27 @@
 package main
 
 import (
+	"github.com/oliviermichaelis/home-sensor/pkg/environment"
 	"log"
-	"net/http"
 )
 
+// Global channel used as buffer
+var measurements = make(chan environment.SensorValues, 1024)
 
 func main() {
-	//value := environment.SensorValues{
-	//	Timestamp:   "20060102150405",
-	//	Station:	"test",
-	//	Temperature: 20.28,
-	//	Humidity:    58.95,
-	//	Pressure:    100615,
-	//}
-	//b, _ := json.Marshal(value)
-	//ioutil.WriteFile("./binary_dump", b, 0644)
-	http.HandleFunc("/measurements/climate", climateHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	go setupServer()
+	readMeasurements(measurements)
+}
+
+func readMeasurements(messages <-chan environment.SensorValues) {
+	client := setupClient()
+	defer client.Close()
+
+	for message := range messages {
+		//TODO if messages buffers more than 1 message, aggregate and send multiple points at once
+		if err := insertPoint(client, message); err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("Inserted into influxdb: %v", message)
+	}
 }
