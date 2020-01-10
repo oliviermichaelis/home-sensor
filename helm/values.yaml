@@ -88,7 +88,8 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: apiserver.lab.oliviermichaelis.dev
-      paths: /measurements/climate
+      paths:
+      - /measurements/climate
 
   tls: []
   #  - secretName: chart-example-tls
