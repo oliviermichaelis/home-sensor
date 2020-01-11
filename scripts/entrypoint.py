@@ -9,8 +9,8 @@ import requests
 import sys
 
 
-# url = "https://apiserver.lab.oliviermichaelis.dev/measurements/climate"
-url = "http://localhost:8080/measurements/climate"
+url = "https://apiserver.lab.oliviermichaelis.dev/measurements/climate"
+# url = "http://localhost:8080/measurements/climate"
 
 
 @dataclasses.dataclass
