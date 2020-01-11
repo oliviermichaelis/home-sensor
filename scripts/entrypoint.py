@@ -9,24 +9,25 @@ import requests
 import sys
 
 
-url = "https://apiserver.lab.oliviermichaelis.dev/measurements/climate"
+# url = "https://apiserver.lab.oliviermichaelis.dev/measurements/climate"
+url = "http://localhost:8080/measurements/climate"
 
 
 @dataclasses.dataclass
 class SensorValues:
-    Timestamp:      str
-    Station:        str
-    Temperature:    float
-    Humidity:       float
-    Pressure:       float
+    timestamp:      str
+    station:        str
+    temperature:    float
+    humidity:       float
+    pressure:       float
 
 
 class GoodEncoder(json.JSONEncoder):
     def default(self, o):
         if dataclasses.is_dataclass(o):
             converted = dataclasses.asdict(o)
-            converted["Station"] = str(converted["Station"])
-            converted["Timestamp"] = str(converted["Timestamp"])
+            converted["station"] = str(converted["station"])
+            converted["timestamp"] = str(converted["timestamp"])
             return converted
         return super().default(o)
 
@@ -76,11 +77,11 @@ def parse_values(values: dict):
     if values is None:
         return None
 
-    return SensorValues(Timestamp=str(values["datetime"]) + "00",    # this is needed for minutes
-                        Station=values["station_id"],
-                        Temperature=values["airtemp_temperature_200"],
-                        Humidity=values["airtemp_humidity"],
-                        Pressure=values["airtemp_pressure_station"])
+    return SensorValues(timestamp=str(values["datetime"]) + "00",    # this is needed for minutes
+                        station=values["station_id"],
+                        temperature=values["airtemp_temperature_200"],
+                        humidity=values["airtemp_humidity"],
+                        pressure=values["airtemp_pressure_station"])
 
 
 def transmit(measurement: SensorValues):
@@ -91,9 +92,9 @@ def transmit(measurement: SensorValues):
 
     response = None
     try:
-        response = requests.post(url=url, json=body_json)
-        if response.status_code is not 200:
-            print("Got http status code 200 as response")
+        response = requests.post(url=url, data=body_json)
+        if response.status_code != 200:
+            print("Didn't get http status code 200 as response")
             sys.exit(2)
     finally:
         response.close()

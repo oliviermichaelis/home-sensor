@@ -12,11 +12,11 @@ import (
 
 // Main struct that holds the measured values
 type SensorValues struct {
-	Timestamp 	string	`json:"timestamp,omitempty"`
-	Station		string	`json:"station,omitempty"`
-	Temperature float64	`json:"temperature,string,omitempty"`
-	Humidity    float64 `json:"temperature,string,omitempty"`
-	Pressure    float64 `json:"temperature,string,omitempty"`
+	Timestamp 	string	`json:"timestamp"`
+	Station		string	`json:"station"`
+	Temperature float64	`json:"temperature"`
+	Humidity    float64 `json:"humidity"`
+	Pressure    float64 `json:"pressure"`
 }
 
 // Environment variables
@@ -54,7 +54,7 @@ func (s SensorValues) IsValid() error {
 		return errors.New("SensorValues: Humidity value is invalid")
 	}
 
-	if 0.0 > s.Pressure || s.Pressure > 1100.0{
+	if s.Pressure < 900.0 || s.Pressure > 1100.0{
 		return errors.New("SensorValues: Pressure value is invalid")
 	}
 
