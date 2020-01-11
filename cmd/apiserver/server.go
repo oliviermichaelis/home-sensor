@@ -61,7 +61,8 @@ func climateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate data in measurement struct
-	if !measurement.IsValid() {
+	if err := measurement.IsValid(); err != nil {
+		log.Printf("Invalid Measurement from %s: %v", r.RemoteAddr, err)
 		errorHandler(w, r, http.StatusBadRequest)
 		return
 	}

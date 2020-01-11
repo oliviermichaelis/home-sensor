@@ -1,6 +1,7 @@
 package environment
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -32,32 +33,32 @@ var (
 	Station  = GetEnv("STATION_ID", "")
 )
 
-func (s SensorValues) IsValid() bool {
+func (s SensorValues) IsValid() error {
 	if s == (SensorValues{}) {
-		return false
+		return errors.New("SensorValues: is initialized empty")
 	}
 
 	if _, err := time.Parse("20060102150405", s.Timestamp); err != nil {
-		return false
+		return errors.New("SensorValues: Timestamp is invalid")
 	}
 
 	if s.Station == "" {
-		return false
+		return errors.New("SensorValues: Station is empty")
 	}
 
 	if -40.0 > s.Temperature || 100.0 < s.Temperature {
-		return false
+		return errors.New("SensorValues: Temperature value is invalid")
 	}
 
 	if -0.1 > s.Humidity || s.Humidity > 100.0 {
-		return false
+		return errors.New("SensorValues: Humidity value is invalid")
 	}
 
 	if 0.0 > s.Pressure {
-		return false
+		return errors.New("SensorValues: Pressure value is invalid")
 	}
 
-	return true
+	return nil
 }
 
 func RabbitmqURL() string {
