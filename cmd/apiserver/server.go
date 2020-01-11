@@ -56,6 +56,7 @@ func climateHandler(w http.ResponseWriter, r *http.Request) {
 
 	var measurement environment.SensorValues
 	if err := json.Unmarshal(body, &measurement); err != nil {
+		log.Printf("Error unmarshaling json: %v", err)
 		errorHandler(w, r, http.StatusBadRequest)
 		return
 	}

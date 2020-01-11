@@ -54,7 +54,7 @@ func (s SensorValues) IsValid() error {
 		return errors.New("SensorValues: Humidity value is invalid")
 	}
 
-	if 0.0 > s.Pressure {
+	if 0.0 > s.Pressure || s.Pressure > 1100.0{
 		return errors.New("SensorValues: Pressure value is invalid")
 	}
 
