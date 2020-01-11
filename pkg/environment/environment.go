@@ -12,11 +12,11 @@ import (
 
 // Main struct that holds the measured values
 type SensorValues struct {
-	Timestamp 	string
-	Station		string
-	Temperature float64
-	Humidity    float64
-	Pressure    float64
+	Timestamp 	string	`json:"timestamp,omitempty"`
+	Station		string	`json:"station,omitempty"`
+	Temperature float64	`json:"temperature,string,omitempty"`
+	Humidity    float64 `json:"temperature,string,omitempty"`
+	Pressure    float64 `json:"temperature,string,omitempty"`
 }
 
 // Environment variables

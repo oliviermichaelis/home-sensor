@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // Handles error cases on API endpoints. Depending on the status code, the server responds with an explanation as json.
@@ -52,6 +53,12 @@ func climateHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error reading body: %v", err)
 		errorHandler(w, r, http.StatusBadRequest)
 		return
+	}
+
+	// Removes escaped double quotes from json generated in python
+	bodyString, err := strconv.Unquote(string(body))
+	if err == nil {
+		body = []byte(bodyString)
 	}
 
 	var measurement environment.SensorValues
