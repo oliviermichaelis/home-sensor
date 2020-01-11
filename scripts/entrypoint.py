@@ -9,6 +9,9 @@ import requests
 import sys
 
 
+url = "https://apiserver.lab.oliviermichaelis.dev/measurements/climate"
+
+
 @dataclasses.dataclass
 class SensorValues:
     Timestamp:      str
@@ -88,7 +91,7 @@ def transmit(measurement: SensorValues):
 
     response = None
     try:
-        response = requests.post("http://localhost:8080/measurements/climate", json=body_json)
+        response = requests.post(url=url, json=body_json)
         if response.status_code is not 200:
             print("Got http status code 200 as response")
             sys.exit(2)

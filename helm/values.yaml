@@ -41,7 +41,7 @@ consumer:
 apiserver:
   image:
     repository: oliviermichaelis/apiserver
-    tag: 0.0.118
+    tag: 0.0.127
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1
@@ -59,7 +59,7 @@ apiserver:
 dwd:
   image:
     repository: oliviermichaelis/dwd
-    tag: 0.0.106
+    tag: 0.0.129
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1
@@ -70,6 +70,13 @@ dwd:
   fullnameOverride: ""
   env:
     STATION_ID: 443
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 300m
+      memory: 512Mi
 
 rabbitmq:
   RABBITMQ_SERVICE_URL: rabbitmq-ha.default.svc.cluster.local
@@ -101,12 +108,12 @@ resources:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
   requests:
     cpu: 10m
     memory: 16Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
 
 
 
