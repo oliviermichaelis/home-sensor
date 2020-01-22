@@ -41,7 +41,7 @@ consumer:
 apiserver:
   image:
     repository: oliviermichaelis/apiserver
-    tag: 0.0.127
+    tag: 0.0.135
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1
@@ -59,7 +59,7 @@ apiserver:
 dwd:
   image:
     repository: oliviermichaelis/dwd
-    tag: 0.0.129
+    tag: 0.0.135
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1
