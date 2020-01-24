@@ -84,12 +84,10 @@ func (handler WebserviceHandler) ClimateHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	// Send measurement to buffered channel which is consumed by readMeasurements()
-	// TODO send back measurements
+	// Persist measurement to whatever infrastructure implements the interface
 	if err := handler.MeasurementInteractor.Store(measurement); err != nil {
 		log.Println(err.Error())
 	}
-	//measurements <- measurement
 
 	if _, err = w.Write(body); err != nil {
 		handler.errorHandler(w, r, http.StatusInternalServerError)

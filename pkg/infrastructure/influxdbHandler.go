@@ -4,21 +4,19 @@ import (
 	"fmt"
 	influxdb "github.com/influxdata/influxdb1-client/v2"
 	"github.com/oliviermichaelis/home-sensor/pkg/domain"
-	"log"
+	"net"
 	"time"
 )
 
-// TODO refactor logging into struct
-var logger = Logger{}
 var measurementBatchPoint = influxdb.BatchPointsConfig {
 	Precision:        "",
 	Database:         "sensor",
 	RetentionPolicy:  "",
 	WriteConsistency: "",
 }
-
 type influxdbHandler struct {
 	client influxdb.Client
+	logger Logger
 }
 
 func NewInfluxdbHandler(host string, port string, username string, password string) *influxdbHandler {
@@ -33,21 +31,23 @@ func NewInfluxdbHandler(host string, port string, username string, password stri
 		TLSConfig:          nil,
 		Proxy:              nil,
 	}
+	
+	influx := influxdbHandler{
+		logger: Logger{},
+	}
 
 	client , err := influxdb.NewHTTPClient(config)
 	if err != nil {
-		logger.Fatal(err.Error())
+		influx.logger.Fatal(err.Error())
 	}
-	return &influxdbHandler{client: client}
+	influx.client = client
+	return &influx
 }
 
 func (handler *influxdbHandler) Insert(measurement domain.Measurement) {
-	// TODO fill in influxdb stuff. Recover from failures
-	// TODO redial
-
 	// transform measurement to influxdb point
 	tags := map[string]string{
-			"station": measurement.Station,
+		"station": measurement.Station,
 	}
 	fields := map[string]interface{}{
 		"temperature":	measurement.Temperature,
@@ -56,32 +56,46 @@ func (handler *influxdbHandler) Insert(measurement domain.Measurement) {
 	}
 	timestamp, err := time.Parse("20060102150405", measurement.Timestamp)
 	if err != nil {
-		logger.Log("could not parse timestamp: ", err)
+		handler.logger.Log("influxdb: could not parse timestamp: ", err)
 		return
 	}
 
 	points, err := influxdb.NewBatchPoints(measurementBatchPoint)
 	if err != nil {
-		logger.Fatal(err)
+		message := "influxdb: could not create batchpoints: "
+		handler.logger.Log(message, err)
+		return
 	}
 
 	point, err := influxdb.NewPoint("sensor", tags, fields, timestamp)
 	if err != nil {
-		log.Fatal(err)
+		message := "influxdb: could not create batchpoint: "
+		handler.logger.Log(message, err)
 	}
 	points.AddPoint(point)
 
-	if err = handler.client.Write(points); err != nil {
-		log.Fatal(err)
+	// Each goroutine will try to reconnect every 10s in case the data could'nt be persisted to influxdb
+	for {
+		err = nil
+		if err = handler.client.Write(points); err != nil {
+			handler.logger.Log("influxdb:", err)
+			if _, ok := err.(net.Error); !ok {
+				// In case the returned error is not a net.Error, the error isn't a networking malfunction/error and can
+				// therefore not be resolved by continuous retries
+				handler.logger.Log("influxdb: error is not net.Error and retries are not prohibited")
+				return
+			}
+		}
+
+		// In case no error has occured, break out of infinite retry loop
+		if err == nil {
+			break
+		}
+		time.Sleep(time.Second * 10)
 	}
 
-
-	message := fmt.Sprintf("stored: %v", measurement)
-	logger.Log(message)
-
-	// TODO handle error in case unrecoverable
-
-	// TODO in best case, password and username are re-read from file
+	message := fmt.Sprintf("influxdb: successful insert: %v", measurement)
+	handler.logger.Log(message)
 }
 
 // Returns the connection URL for the influxdb client
