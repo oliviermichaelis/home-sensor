@@ -1,18 +1,26 @@
-package main
+package interfaces
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/oliviermichaelis/home-sensor/pkg/environment"
+	"github.com/oliviermichaelis/home-sensor/pkg/domain"
 	"net/http/httptest"
 	"testing"
 )
 
+type mockedMeasurementInteractor struct {}
+
+func (m *mockedMeasurementInteractor) Store(measurement domain.Measurement) error {
+	return nil
+}
+
 func TestClimateHandlerInvalidMethod(t *testing.T) {
 	request := httptest.NewRequest("GET", "https://apiserver.lab.oliviermichaelis.dev/measurements/climate", nil)
 	recorder := httptest.NewRecorder()
-	climateHandler(recorder, request)
+
+	webserviceHandler := WebserviceHandler{}
+	webserviceHandler.ClimateHandler(recorder, request)
 
 	response := recorder.Result()
 	fmt.Println(response.Body)
@@ -24,7 +32,9 @@ func TestClimateHandlerInvalidMethod(t *testing.T) {
 func TestClimateHandlerNoBody(t *testing.T) {
 	request := httptest.NewRequest("POST", "https://apiserver.lab.oliviermichaelis.dev/measurements/climate", nil)
 	recorder := httptest.NewRecorder()
-	climateHandler(recorder, request)
+
+	webserviceHandler := WebserviceHandler{}
+	webserviceHandler.ClimateHandler(recorder, request)
 
 	response := recorder.Result()
 	if response.StatusCode != 400 {
@@ -33,7 +43,7 @@ func TestClimateHandlerNoBody(t *testing.T) {
 }
 
 func TestClimateHandlerInvalidData(t *testing.T) {
-	measurement := environment.SensorValues{
+	measurement := domain.Measurement{
 		Timestamp:   "",
 		Station:     "",
 		Temperature: 0,
@@ -45,7 +55,9 @@ func TestClimateHandlerInvalidData(t *testing.T) {
 	reader := bytes.NewReader(body)
 	request := httptest.NewRequest("POST", "https://apiserver.lab.oliviermichaelis.dev/measurements/climate", reader)
 	recorder := httptest.NewRecorder()
-	climateHandler(recorder, request)
+
+	webserviceHandler := WebserviceHandler{}
+	webserviceHandler.ClimateHandler(recorder, request)
 
 	response := recorder.Result()
 	if response.StatusCode != 400 {
@@ -54,7 +66,7 @@ func TestClimateHandlerInvalidData(t *testing.T) {
 }
 
 func TestClimateHandlerValidData(t *testing.T) {
-	measurement := environment.SensorValues{
+	measurement := domain.Measurement{
 		Timestamp:   "20060102150405",
 		Station:     "test",
 		Temperature: 21.0,
@@ -66,7 +78,10 @@ func TestClimateHandlerValidData(t *testing.T) {
 	reader := bytes.NewReader(body)
 	request := httptest.NewRequest("POST", "https://apiserver.lab.oliviermichaelis.dev/measurements/climate", reader)
 	recorder := httptest.NewRecorder()
-	climateHandler(recorder, request)
+
+	webserviceHandler := WebserviceHandler{}
+	webserviceHandler.MeasurementInteractor = &mockedMeasurementInteractor{}
+	webserviceHandler.ClimateHandler(recorder, request)
 
 	response := recorder.Result()
 	if response.StatusCode != 200 {

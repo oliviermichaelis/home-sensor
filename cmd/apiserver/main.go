@@ -1,30 +1,69 @@
 package main
 
 import (
-	"errors"
-	"github.com/oliviermichaelis/home-sensor/pkg/environment"
-	"log"
+	"github.com/oliviermichaelis/home-sensor/pkg/infrastructure"
+	"github.com/oliviermichaelis/home-sensor/pkg/interfaces"
+	"github.com/oliviermichaelis/home-sensor/pkg/usecases"
+	"net/http"
+	"os"
 )
 
-// Global channel used as buffer
-var measurements = make(chan environment.SensorValues, 1024)
-
 func main() {
-	go setupServer()
-	log.Fatal(readMeasurements(measurements))
-}
+	// initialize logger
+	logger := infrastructure.Logger{}
 
-func readMeasurements(messages <-chan environment.SensorValues) error {
-	client := setupClient()
-	defer client.Close()
-
-	for message := range messages {
-		//TODO if messages buffers more than 1 message, aggregate and send multiple points at once
-		if err := insertPoint(client, message); err != nil {
-			return err
-		}
-		log.Printf("Inserted into influxdb: %v", message)
+	// initialize configuration
+	url, err := infrastructure.RegisterConfig("INFLUX_SERVICE_URL", "localhost")
+	if err != nil {
+		logger.Log(err.Error())
 	}
 
-	return errors.New("readMeasurements: infinite loop got broken")
+	port, err := infrastructure.RegisterConfig("INFLUX_SERVICE_PORT", "8086")
+	if err != nil {
+		logger.Log(err.Error())
+	}
+
+	secretPath, err := infrastructure.RegisterConfig("INFLUX_SECRET_PATH", "/credentials/influx")
+	if err != nil {
+		logger.Log(err.Error())
+	}
+
+	if _, err := infrastructure.RegisterConfig("DEBUG", "false"); err != nil {
+		logger.Log(err.Error())
+	}
+
+	if _, err := infrastructure.RegisterConfig("STATION_ID", ""); err != nil {
+		logger.Log(err.Error())
+	}
+
+	username, err := infrastructure.ReadUsername(secretPath)
+	if err != nil {
+		logger.Log(err.Error())
+		os.Exit(3)
+	}
+
+	password, err := infrastructure.ReadPassword(secretPath)
+	if err != nil {
+		logger.Log(err.Error())
+		os.Exit(3)
+	}
+
+	// setup database connection
+	databaseHandler := infrastructure.NewInfluxdbHandler(url, port, username, password)
+
+	handlers := make(map[string]interfaces.DatabaseHandler)
+	handlers["DatabaseMeasurementRepo"] = databaseHandler
+
+	measurementInteractor := new(usecases.MeasurementInteractor)
+	measurementInteractor.MeasurementRepository = interfaces.NewDatabaseMeasurementRepo(handlers)
+	measurementInteractor.Logger = infrastructure.Logger{}
+
+	webserviceHandler := interfaces.WebserviceHandler{}
+	webserviceHandler.MeasurementInteractor = measurementInteractor
+
+	http.HandleFunc("/measurements/climate", func(writer http.ResponseWriter, request *http.Request) {
+		webserviceHandler.ClimateHandler(writer, request)
+	})
+
+	logger.Fatal(http.ListenAndServe(":8080", nil))
 }
