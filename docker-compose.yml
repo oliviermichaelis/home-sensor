@@ -8,3 +8,18 @@ services:
       - INFLUXDB_DB=sensor
       - INFLUXDB_USER=guest
       - INFLUXDB_USER_PASSWORD=supersecretpassword
+  apiserver:
+    image: "oliviermichaelis/apiserver:dev"
+    build:
+      context: .
+      dockerfile: cmd/apiserver/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - INFLUX_SERVICE_URL=localhost
+      - INFLUX_SERVICE_PORT=8086
+      - INFLUX_SECRET_PATH=/test/influxdb
+      - STATION_ID=test
+    volumes:
+    - ./test:/test
+
