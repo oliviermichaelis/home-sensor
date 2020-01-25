@@ -45,6 +45,7 @@ jobs:
           docker buildx use multiarch
       - run: |
           docker login -u $DOCKER_USER -p $DOCKER_PASS
+          echo $CIRCLE_TAG
           docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_DWD:$CIRCLE_TAG --push -f scripts/Dockerfile .
           docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_APISERVER:$CIRCLE_TAG --push -f cmd/apiserver/Dockerfile .
 workflows:
@@ -57,6 +58,6 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              ignore: /.*/
             tags:
               only: /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
