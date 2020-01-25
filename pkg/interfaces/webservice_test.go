@@ -15,6 +15,7 @@ var testWebserviceHandler = WebserviceHandler{
 	MeasurementInteractor: &mockedMeasurementInteractor{},
 	Logger: infrastructure.Logger{},
 }
+
 func (m *mockedMeasurementInteractor) Store(measurement domain.Measurement) error {
 	return nil
 }
