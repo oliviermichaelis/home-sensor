@@ -44,10 +44,9 @@ jobs:
           docker buildx create --name multiarch --platform linux/amd64,linux/arm/v7
           docker buildx use multiarch
       - run: |
-          TAG=0.0.$CIRCLE_BUILD_NUM
           docker login -u $DOCKER_USER -p $DOCKER_PASS
-          docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_DWD:$TAG --push -f scripts/Dockerfile .
-          docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_APISERVER:$TAG --push -f cmd/apiserver/Dockerfile .
+          docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_DWD:$CIRCLE_TAG --push -f scripts/Dockerfile .
+          docker buildx build --platform linux/arm/v7,linux/amd64 -t $IMAGE_NAME_APISERVER:$CIRCLE_TAG --push -f cmd/apiserver/Dockerfile .
 workflows:
   version: 2
   build-test-push:
