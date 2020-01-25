@@ -58,8 +58,10 @@ func main() {
 	measurementInteractor.MeasurementRepository = interfaces.NewDatabaseMeasurementRepo(handlers)
 	measurementInteractor.Logger = infrastructure.Logger{}
 
-	webserviceHandler := interfaces.WebserviceHandler{}
-	webserviceHandler.MeasurementInteractor = measurementInteractor
+	webserviceHandler := interfaces.WebserviceHandler{
+		MeasurementInteractor: measurementInteractor,
+		Logger: infrastructure.Logger{},
+	}
 
 	http.HandleFunc("/measurements/climate", func(writer http.ResponseWriter, request *http.Request) {
 		webserviceHandler.ClimateHandler(writer, request)

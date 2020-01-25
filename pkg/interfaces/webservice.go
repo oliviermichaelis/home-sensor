@@ -2,11 +2,11 @@ package interfaces
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/oliviermichaelis/home-sensor/pkg/domain"
+	"github.com/oliviermichaelis/home-sensor/pkg/infrastructure"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"strconv"
 )
 
 type MeasurementInteractor interface {
@@ -15,6 +15,7 @@ type MeasurementInteractor interface {
 
 type WebserviceHandler struct {
 	MeasurementInteractor MeasurementInteractor
+	Logger  infrastructure.Logger
 }
 
 
@@ -38,7 +39,8 @@ func (handler WebserviceHandler) errorHandler(w http.ResponseWriter, r *http.Req
 			Message: "400 Request is malformed",
 		}
 	default:
-		log.Fatalf("Error to be handled is unknown: %d", status)
+		message := fmt.Sprintf("Error to be handled is unknown: %d", status)
+		handler.Logger.Fatal(message)
 		return
 	}
 
@@ -59,34 +61,34 @@ func (handler WebserviceHandler) ClimateHandler(w http.ResponseWriter, r *http.R
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("Error reading body: %v", err)
+		handler.Logger.Log(fmt.Sprintf("Error reading body: %v", err))
 		handler.errorHandler(w, r, http.StatusBadRequest)
 		return
 	}
 
 	// Removes escaped double quotes from json generated in python
-	bodyString, err := strconv.Unquote(string(body))
-	if err == nil {
-		body = []byte(bodyString)
-	}
+	//bodyString, err := strconv.Unquote(string(body))
+	//if err == nil {
+	//	body = []byte(bodyString)
+	//}
 
 	var measurement domain.Measurement
 	if err := json.Unmarshal(body, &measurement); err != nil {
-		log.Print(err)
+		handler.Logger.Log("webservice:", err)
 		handler.errorHandler(w, r, http.StatusBadRequest)
 		return
 	}
 
 	// Validate data in measurement struct
-	if err := measurement.IsValid(); err != nil {
-		log.Printf("Invalid Measurement from %s: %v", r.RemoteAddr, err)
-		handler.errorHandler(w, r, http.StatusBadRequest)
-		return
-	}
+	//if err := measurement.IsValid(); err != nil {
+	//	log.Printf("Invalid Measurement from %s: %v", r.RemoteAddr, err)
+	//	handler.errorHandler(w, r, http.StatusBadRequest)
+	//	return
+	//}
 
 	// Persist measurement to whatever infrastructure implements the interface
 	if err := handler.MeasurementInteractor.Store(measurement); err != nil {
-		log.Println(err.Error())
+		handler.Logger.Log("webservice:", err)
 	}
 
 	if _, err = w.Write(body); err != nil {
