@@ -52,7 +52,10 @@ workflows:
   version: 2
   build-test-push:
     jobs:
-      - build
+      - build:
+          filters:
+            tags:
+              only: /^\d+\.\d+\.\d+$/
       - push-docker:
           requires:
             - build
