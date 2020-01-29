@@ -1,13 +1,16 @@
 package infrastructure
 
 import (
+	"errors"
 	"fmt"
 	influxdb "github.com/influxdata/influxdb1-client/v2"
 	"github.com/oliviermichaelis/home-sensor/pkg/domain"
+	"log"
 	"net"
 	"time"
 )
 
+// TODO don't hardcode database name
 var measurementBatchPoint = influxdb.BatchPointsConfig {
 	Precision:        "",
 	Database:         "sensor",
@@ -19,7 +22,21 @@ type influxdbHandler struct {
 	logger Logger
 }
 
-func NewInfluxdbHandler(host string, port string, username string, password string) *influxdbHandler {
+func NewInfluxdbHandler(host string, port string, username string, password string) (*influxdbHandler, error) {
+	// Input validation
+	if len(host) == 0 {
+		return nil, errors.New("influxdb: host is empty")
+	}
+	if len(port) == 0 {
+		return nil, errors.New("influxdb: port is empty")
+	}
+	if len(username) == 0 {
+		return nil, errors.New("influxdb: username is empty")
+	}
+	if len(password) == 0 {
+		return nil, errors.New("influxdb: password is empty")
+	}
+
 	// TODO implement TLS
 	config := influxdb.HTTPConfig {
 		Addr:               influxURL(host, port),
@@ -41,10 +58,17 @@ func NewInfluxdbHandler(host string, port string, username string, password stri
 		influx.logger.Fatal(err.Error())
 	}
 	influx.client = client
-	return &influx
+	return &influx, nil
 }
 
 func (handler *influxdbHandler) Insert(measurement domain.Measurement) {
+	// input validation
+	if handler.client == nil {
+		log.Fatal("influxdb: client is uninitialized")
+	}
+
+	//TODO check if measurement is valid
+
 	// transform measurement to influxdb point
 	tags := map[string]string{
 		"station": measurement.Station,
@@ -94,11 +118,12 @@ func (handler *influxdbHandler) Insert(measurement domain.Measurement) {
 		time.Sleep(time.Second * 10)
 	}
 
-	message := fmt.Sprintf("influxdb: successful insert: %v", measurement)
+	message := fmt.Sprintf("influxdb: successfully inserted: %v", measurement)
 	handler.logger.Log(message)
 }
 
 // Returns the connection URL for the influxdb client
+// TODO add flag for https
 func influxURL(host string, port string) string {
 	return fmt.Sprintf("http://%s:%s", host, port)
 }
