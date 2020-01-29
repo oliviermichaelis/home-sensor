@@ -49,7 +49,10 @@ func main() {
 	}
 
 	// setup database connection
-	databaseHandler := infrastructure.NewInfluxdbHandler(url, port, username, password)
+	databaseHandler, err := infrastructure.NewInfluxdbHandler(url, port, username, password)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	handlers := make(map[string]interfaces.DatabaseHandler)
 	handlers["DatabaseMeasurementRepo"] = databaseHandler

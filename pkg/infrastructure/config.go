@@ -31,7 +31,7 @@ func (c *config) get(key string) (string, error) {
 		return "", errors.New("config: key is empty")
 	}
 
-	retrieved,  ok := (*c)[key]
+	retrieved, ok := (*c)[key]
 	if !ok {
 		return "", errors.New("config: configMap doesn't contain the key:" + key)
 	}

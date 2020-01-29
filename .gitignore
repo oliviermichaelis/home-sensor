@@ -15,6 +15,7 @@ scripts/username
 
 # IDE
 .idea
+.DS_Store
 
 # Virtual env
 venv
