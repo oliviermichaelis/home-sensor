@@ -9,6 +9,7 @@ type MeasurementRepository interface {
 	Store(measurement Measurement)
 }
 
+// TODO change Timestamp to go time representation
 // Main struct that holds the measured values
 type Measurement struct {
 	Timestamp 	string	`json:"timestamp"`
@@ -41,4 +42,13 @@ func (s *Measurement) IsValid() error {
 
 	return nil
 }
+
+func (m *Measurement) PopulateRandomValues() {
+	m.Timestamp = time.Now().UTC().Format("20060102150405")
+	m.Station = "generated"
+	m.Temperature = 20.28
+	m.Humidity = 68.96
+	m.Pressure = 1000.15
+}
+
 

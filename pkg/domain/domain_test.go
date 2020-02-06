@@ -1,17 +1,13 @@
 package domain
 
-import "testing"
+import (
+	"testing"
+)
 
-var validMeasurement = Measurement{
-	Timestamp:   "20060102160405",
-	Station:     "test",
-	Temperature: 20.28,
-	Humidity:    58.95,
-	Pressure:    1000.15,
-}
 
 func TestMeasurement_IsValid(t *testing.T) {
-	measurement := validMeasurement
+	measurement := Measurement{}
+	measurement.PopulateRandomValues()
 	if err := measurement.IsValid(); err != nil {
 		t.Error("unexpected error: ", err)
 	}
@@ -21,31 +17,36 @@ func TestMeasurement_IsValid(t *testing.T) {
 		t.Error("expected error, but is nil")
 	}
 
-	measurement = validMeasurement
+	measurement = Measurement{}
+	measurement.PopulateRandomValues()
 	measurement.Station = ""
 	if err := measurement.IsValid(); err == nil {
 		t.Error("expected error, but is nil")
 	}
 
-	measurement = validMeasurement
+	measurement = Measurement{}
+	measurement.PopulateRandomValues()
 	measurement.Temperature = -41.0
 	if err := measurement.IsValid(); err == nil {
 		t.Error("expected error, but is nil")
 	}
 
-	measurement = validMeasurement
+	measurement = Measurement{}
+	measurement.PopulateRandomValues()
 	measurement.Humidity = -1.0
 	if err := measurement.IsValid(); err == nil {
 		t.Error("expected error, but is nil")
 	}
 
-	measurement = validMeasurement
+	measurement = Measurement{}
+	measurement.PopulateRandomValues()
 	measurement.Humidity = 102.3
 	if err := measurement.IsValid(); err == nil {
 		t.Error("expected error, but is nil")
 	}
 
-	measurement = validMeasurement
+	measurement = Measurement{}
+	measurement.PopulateRandomValues()
 	measurement.Pressure = 1200.0
 	if err := measurement.IsValid(); err == nil {
 		t.Error("expected error, but is nil")
