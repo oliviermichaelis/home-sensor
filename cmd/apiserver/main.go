@@ -28,6 +28,10 @@ func main() {
 		logger.Log(err.Error())
 	}
 
+	if _, err := infrastructure.RegisterConfig(infrastructure.EnvInfluxDatabase, "sensor"); err != nil {
+		logger.Log(err)
+	}
+
 	if _, err := infrastructure.RegisterConfig("DEBUG", "false"); err != nil {
 		logger.Log(err.Error())
 	}

@@ -10,13 +10,8 @@ import (
 	"time"
 )
 
-// TODO don't hardcode database name
-var measurementBatchPoint = influxdb.BatchPointsConfig {
-	Precision:        "",
-	Database:         "sensor",
-	RetentionPolicy:  "",
-	WriteConsistency: "",
-}
+const EnvInfluxDatabase = "INFLUX_DATABASE"
+
 type influxdbHandler struct {
 	client influxdb.Client
 	logger Logger
@@ -82,6 +77,18 @@ func (handler *influxdbHandler) Insert(measurement domain.Measurement) {
 	if err != nil {
 		handler.logger.Log("influxdb: could not parse timestamp: ", err)
 		return
+	}
+
+	database, err := GetConfig(EnvInfluxDatabase)
+	if err != nil {
+		handler.logger.Fatal("influxdb: could not retrieve database name")
+	}
+
+	var measurementBatchPoint = influxdb.BatchPointsConfig {
+		Precision:        "",
+		Database:         database,
+		RetentionPolicy:  "",
+		WriteConsistency: "",
 	}
 
 	points, err := influxdb.NewBatchPoints(measurementBatchPoint)
