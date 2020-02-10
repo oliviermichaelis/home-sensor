@@ -29,7 +29,7 @@ func TestNewInfluxdbHandler(t *testing.T) {
 
 //func TestInfluxdbHandler_Insert(t *testing.T) {
 //	measurement := domain.Measurement{}
-//	measurement.PopulateRandomValues()
+//	measurement.PopulateTestValues()
 //
 //	c, err := NewInfluxdbHandler("localhost", "8086", "user", "pass")
 //	if c == nil || err != nil {

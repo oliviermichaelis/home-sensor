@@ -19,31 +19,31 @@ type Measurement struct {
 	Pressure    float64 `json:"pressure"`
 }
 
-func (s *Measurement) IsValid() error {
-	if _, err := time.Parse("20060102150405", s.Timestamp); err != nil {
-		return errors.New("Measurement: Timestamp is invalid")
+func (m *Measurement) IsValid() error {
+	if _, err := time.Parse("20060102150405", m.Timestamp); err != nil {
+		return errors.New("measurement: Timestamp is invalid")
 	}
 
-	if s.Station == "" {
-		return errors.New("Measurement: Station is empty")
+	if m.Station == "" {
+		return errors.New("measurement: Station is empty")
 	}
 
-	if -40.0 > s.Temperature || 100.0 < s.Temperature {
-		return errors.New("Measurement: Temperature value is invalid")
+	if -40.0 > m.Temperature || 100.0 < m.Temperature {
+		return errors.New("measurement: Temperature value is invalid")
 	}
 
-	if 0.0 > s.Humidity || s.Humidity > 100.0 {
-		return errors.New("Measurement: Humidity value is invalid")
+	if 0.0 > m.Humidity || m.Humidity > 100.0 {
+		return errors.New("measurement: Humidity value is invalid")
 	}
 
-	if s.Pressure < 900.0 || s.Pressure > 1100.0{
-		return errors.New("Measurement: Pressure value is invalid")
+	if m.Pressure < 900.0 || m.Pressure > 1100.0{
+		return errors.New("measurement: Pressure value is invalid")
 	}
 
 	return nil
 }
 
-func (m *Measurement) PopulateRandomValues() {
+func (m *Measurement) PopulateTestValues() {
 	m.Timestamp = time.Now().UTC().Format("20060102150405")
 	m.Station = "generated"
 	m.Temperature = 20.28

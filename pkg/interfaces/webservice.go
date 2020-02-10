@@ -66,25 +66,12 @@ func (handler WebserviceHandler) ClimateHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	// Removes escaped double quotes from json generated in python
-	//bodyString, err := strconv.Unquote(string(body))
-	//if err == nil {
-	//	body = []byte(bodyString)
-	//}
-
 	var measurement domain.Measurement
 	if err := json.Unmarshal(body, &measurement); err != nil {
 		handler.Logger.Log("webservice:", err)
 		handler.errorHandler(w, r, http.StatusBadRequest)
 		return
 	}
-
-	// Validate data in measurement struct
-	//if err := measurement.IsValid(); err != nil {
-	//	log.Printf("Invalid Measurement from %s: %v", r.RemoteAddr, err)
-	//	handler.errorHandler(w, r, http.StatusBadRequest)
-	//	return
-	//}
 
 	// Persist measurement to whatever infrastructure implements the interface
 	if err := handler.MeasurementInteractor.Store(measurement); err != nil {

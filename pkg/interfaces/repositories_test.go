@@ -27,6 +27,6 @@ func TestDatabaseMeasurementRepo_Store(t *testing.T) {
 	databaseMeasurementRepo.databaseHandler = &mockedDatabaseHandler{}
 
 	measurement := domain.Measurement{}
-	measurement.PopulateRandomValues()
+	measurement.PopulateTestValues()
 	databaseMeasurementRepo.Store(measurement)
 }
