@@ -18,7 +18,6 @@ type WebserviceHandler struct {
 	Logger  infrastructure.Logger
 }
 
-
 // Handles error cases on API endpoints. Depending on the status code, the server responds with an explanation as json.
 func (handler WebserviceHandler) errorHandler(w http.ResponseWriter, r *http.Request, status int) {
 	type Message struct {

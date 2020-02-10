@@ -5,7 +5,6 @@ import (
 	"fmt"
 	influxdb "github.com/influxdata/influxdb1-client/v2"
 	"github.com/oliviermichaelis/home-sensor/pkg/domain"
-	"log"
 	"net"
 	"time"
 )
@@ -57,13 +56,6 @@ func NewInfluxdbHandler(host string, port string, username string, password stri
 }
 
 func (handler *influxdbHandler) Insert(measurement domain.Measurement) {
-	// input validation
-	if handler.client == nil {
-		log.Fatal("influxdb: client is uninitialized")
-	}
-
-	//TODO check if measurement is valid
-
 	// transform measurement to influxdb point
 	tags := map[string]string{
 		"station": measurement.Station,

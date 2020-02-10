@@ -30,6 +30,8 @@ spec:
               value: {{ .Values.apiserver.env.INFLUX_SERVICE_URL | quote }}
             - name: INFLUX_SERVICE_PORT
               value: {{ .Values.apiserver.env.INFLUX_SERVICE_PORT | quote }}
+            - name: INFLUX_DATABASE
+              value: {{ .Values.apiserver.env.Influx_DATABASE | quote }}
             - name: INFLUX_SECRET_PATH
               value: {{ .Values.apiserver.volume.mountPathInflux | quote }}
           ports:
@@ -47,6 +49,8 @@ spec:
           volumeMounts:
             - name: influxdb-credentials
               mountPath: {{ .Values.apiserver.volume.mountPathInflux }}
+            - name: influxdata
+              mountPath: {{ .Values.apiserver.volume.mountPathInfluxdata }}
           securityContext:
             privileged: false
           resources:
@@ -54,12 +58,20 @@ spec:
       volumes:
         - name: influxdb-credentials
           secret:
-            secretName: {{ .Values.apiserver.influxSecret }}
+            secretName: {{ .Values.apiserver.secrets.influxdb }}
             items:
               - key: influxdb-user
                 path: username
               - key: influxdb-password
                 path: password
+        - name: influxdata
+          secret:
+            secretName: {{ .Values.apiserver.secrets.influxdata }}
+            items:
+              - key: token
+                path: token
+              - key: org
+                path: org
       {{- with .Values.apiserver.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

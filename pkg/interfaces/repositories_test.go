@@ -25,6 +25,7 @@ func TestDatabaseMeasurementRepo_Store(t *testing.T) {
 	databaseHandlers["DatabaseMeasurementRepo"] = &mockedDatabaseHandler{}
 	databaseMeasurementRepo := NewDatabaseMeasurementRepo(databaseHandlers)
 	databaseMeasurementRepo.databaseHandler = &mockedDatabaseHandler{}
+	databaseMeasurementRepo.influxCloudHandler = &mockedDatabaseHandler{}
 
 	measurement := domain.Measurement{}
 	measurement.PopulateTestValues()
