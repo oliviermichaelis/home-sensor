@@ -72,6 +72,8 @@ spec:
                 path: token
               - key: org
                 path: org
+              - key: url
+                path: url
       {{- with .Values.apiserver.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

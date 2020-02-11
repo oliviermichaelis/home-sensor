@@ -32,11 +32,6 @@ func main() {
 		logger.Log(err)
 	}
 
-	influxUrl, err := infrastructure.RegisterConfig("INFLUX_CLOUD_URL", "localhost")
-	if err != nil {
-		logger.Log(err)
-	}
-
 	if _, err := infrastructure.RegisterConfig("DEBUG", "false"); err != nil {
 		logger.Log(err.Error())
 	}
@@ -64,6 +59,11 @@ func main() {
 	}
 
 	// setup connection to influxdata cloud
+	influxUrl, err := infrastructure.ReadSecret("/credentials/influxdata/url")
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	token, err := infrastructure.ReadSecret("/credentials/influxdata/token")
 	if err != nil {
 		logger.Fatal(err)
@@ -73,6 +73,7 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
+
 	influxdataHandler, err := infrastructure.NewInfluxCloudHandler(influxUrl, token, org)
 	if err != nil {
 		logger.Fatal(err)

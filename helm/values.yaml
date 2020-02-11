@@ -41,7 +41,7 @@ consumer:
 apiserver:
   image:
     repository: oliviermichaelis/apiserver
-    tag: 0.0.135
+    tag: 0.1.1
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1

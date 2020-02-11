@@ -9,8 +9,8 @@ import (
 
 type influxCloudHandler struct {
 	client *influxdb2.Client
-	logger Logger
 	org string
+	logger Logger
 }
 
 func NewInfluxCloudHandler(url string, token string, org string) (*influxCloudHandler, error) {

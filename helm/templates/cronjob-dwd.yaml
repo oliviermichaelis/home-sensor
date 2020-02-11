@@ -6,18 +6,18 @@ metadata:
 {{ include "helm.labels" . | indent 4 }}
 spec:
   schedule: "*/10 * * * *"
-  ttlSecondsAfterFinished: 300
-  selector:
-    matchLabels:
-    app.kubernetes.io/name: {{ include "helm.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+#  ttlSecondsAfterFinished: 300
+#  selector:
+#    matchLabels:
+#      app.kubernetes.io/name: {{ include "helm.name" . }}
+#      app.kubernetes.io/instance: {{ .Release.Name }}
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
-          app.kubernetes.io/name: {{ include "helm.name" . }}
-          app.kubernetes.io/instance: {{ .Release.Name }}
+            app.kubernetes.io/name: {{ include "helm.name" . }}
+            app.kubernetes.io/instance: {{ .Release.Name }}
         spec:
           {{- with .Values.dwd.imagePullSecrets }}
           imagePullSecrets:
