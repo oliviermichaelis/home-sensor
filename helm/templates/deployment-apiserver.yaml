@@ -31,7 +31,7 @@ spec:
             - name: INFLUX_SERVICE_PORT
               value: {{ .Values.apiserver.env.INFLUX_SERVICE_PORT | quote }}
             - name: INFLUX_DATABASE
-              value: {{ .Values.apiserver.env.Influx_DATABASE | quote }}
+              value: {{ .Values.apiserver.env.INFLUX_DATABASE | quote }}
             - name: INFLUX_SECRET_PATH
               value: {{ .Values.apiserver.volume.mountPathInflux | quote }}
           ports:

@@ -46,7 +46,7 @@ func (c *config) get(key string) (string, error) {
 func getEnv(key, fallback string) string {
 	value, exists := os.LookupEnv(key)
 	if !exists {
-		value = fallback
+		return fallback
 	}
 	return value
 }

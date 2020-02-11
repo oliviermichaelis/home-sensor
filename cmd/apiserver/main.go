@@ -36,9 +36,9 @@ func main() {
 		logger.Log(err.Error())
 	}
 
-	if _, err := infrastructure.RegisterConfig("STATION_ID", ""); err != nil {
-		logger.Log(err.Error())
-	}
+	//if _, err := infrastructure.RegisterConfig("STATION_ID", ""); err != nil {
+	//	logger.Log(err.Error())
+	//}
 
 	username, err := infrastructure.ReadUsername(secretPath)
 	if err != nil {
