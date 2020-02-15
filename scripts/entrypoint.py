@@ -1,7 +1,8 @@
 #!/bin/python
+
 import os
 import dwdweather as dwd
-import pika
+# import pika
 import dataclasses
 import json
 import datetime
@@ -40,15 +41,15 @@ def get_environment(variable: str, default: str) -> str:
     return retrieved
 
 
-def retrieve_credentials(secret_path) -> pika.PlainCredentials:
-    file_username = open(secret_path + "/username", "r")
-    file_password = open(secret_path + "/password", "r")
-    credentials = pika.PlainCredentials(file_username.read().rstrip(), file_password.read().rstrip())
-
-    file_username.close()
-    file_password.close()
-
-    return credentials
+# def retrieve_credentials(secret_path) -> pika.PlainCredentials:
+#     file_username = open(secret_path + "/username", "r")
+#     file_password = open(secret_path + "/password", "r")
+#     credentials = pika.PlainCredentials(file_username.read().rstrip(), file_password.read().rstrip())
+#
+#     file_username.close()
+#     file_password.close()
+#
+#     return credentials
 
 
 def retrieve_data() -> list:
