@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-type mockedDatabaseHandler struct {}
+type mockedDatabaseHandler struct{}
 
 func (h *mockedDatabaseHandler) Insert(measurement domain.Measurement) {
 	return

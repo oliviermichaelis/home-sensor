@@ -15,7 +15,7 @@ type MeasurementInteractor interface {
 
 type WebserviceHandler struct {
 	MeasurementInteractor MeasurementInteractor
-	Logger  infrastructure.Logger
+	Logger                infrastructure.Logger
 }
 
 // Handles error cases on API endpoints. Depending on the status code, the server responds with an explanation as json.

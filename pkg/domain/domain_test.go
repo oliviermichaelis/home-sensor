@@ -4,7 +4,6 @@ import (
 	"testing"
 )
 
-
 func TestMeasurement_IsValid(t *testing.T) {
 	measurement := Measurement{}
 	measurement.PopulateTestValues()

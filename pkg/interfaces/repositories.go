@@ -9,9 +9,9 @@ type DatabaseHandler interface {
 }
 
 type DatabaseRepo struct {
-	databaseHandlers 	map[string]DatabaseHandler
-	databaseHandler		DatabaseHandler
-	influxCloudHandler	DatabaseHandler
+	databaseHandlers   map[string]DatabaseHandler
+	databaseHandler    DatabaseHandler
+	influxCloudHandler DatabaseHandler
 }
 
 type DatabaseMeasurementRepo DatabaseRepo

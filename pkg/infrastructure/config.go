@@ -13,7 +13,7 @@ var configMap = make(config)
 
 func (c *config) register(key string, fallback string) (string, error) {
 	if len(key) <= 0 {
-		 return "", errors.New("config: to be registered key is empty")
+		return "", errors.New("config: to be registered key is empty")
 	}
 
 	returned := getEnv(key, fallback)

@@ -12,9 +12,9 @@ type MeasurementRepository interface {
 // TODO change Timestamp to go time representation
 // Main struct that holds the measured values
 type Measurement struct {
-	Timestamp 	string	`json:"timestamp"`
-	Station		string	`json:"station"`
-	Temperature float64	`json:"temperature"`
+	Timestamp   string  `json:"timestamp"`
+	Station     string  `json:"station"`
+	Temperature float64 `json:"temperature"`
 	Humidity    float64 `json:"humidity"`
 	Pressure    float64 `json:"pressure"`
 }
@@ -36,7 +36,7 @@ func (m *Measurement) IsValid() error {
 		return errors.New("measurement: Humidity value is invalid")
 	}
 
-	if m.Pressure < 900.0 || m.Pressure > 1100.0{
+	if m.Pressure < 900.0 || m.Pressure > 1100.0 {
 		return errors.New("measurement: Pressure value is invalid")
 	}
 
@@ -50,5 +50,3 @@ func (m *Measurement) PopulateTestValues() {
 	m.Humidity = 68.96
 	m.Pressure = 1000.15
 }
-
-

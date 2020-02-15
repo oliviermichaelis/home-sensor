@@ -10,7 +10,7 @@ type Logger interface {
 
 type MeasurementInteractor struct {
 	MeasurementRepository domain.MeasurementRepository
-	Logger Logger
+	Logger                Logger
 }
 
 func (interactor *MeasurementInteractor) Store(measurement domain.Measurement) error {

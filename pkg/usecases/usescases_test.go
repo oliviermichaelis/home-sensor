@@ -14,7 +14,7 @@ var validMeasurement = domain.Measurement{
 	Pressure:    1000.15,
 }
 
-type mockedMeasurementRepository struct {}
+type mockedMeasurementRepository struct{}
 
 func (m *mockedMeasurementRepository) Store(measurement domain.Measurement) {
 	return

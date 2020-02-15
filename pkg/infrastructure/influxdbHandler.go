@@ -32,7 +32,7 @@ func NewInfluxdbHandler(host string, port string, username string, password stri
 	}
 
 	// TODO implement TLS
-	config := influxdb.HTTPConfig {
+	config := influxdb.HTTPConfig{
 		Addr:               influxURL(host, port),
 		Username:           username,
 		Password:           password,
@@ -42,12 +42,12 @@ func NewInfluxdbHandler(host string, port string, username string, password stri
 		TLSConfig:          nil,
 		Proxy:              nil,
 	}
-	
+
 	influx := influxdbHandler{
 		logger: Logger{},
 	}
 
-	client , err := influxdb.NewHTTPClient(config)
+	client, err := influxdb.NewHTTPClient(config)
 	if err != nil {
 		influx.logger.Fatal(err.Error())
 	}
@@ -61,9 +61,9 @@ func (handler *influxdbHandler) Insert(measurement domain.Measurement) {
 		"station": measurement.Station,
 	}
 	fields := map[string]interface{}{
-		"temperature":	measurement.Temperature,
-		"humidity":		measurement.Humidity,
-		"pressure": 	measurement.Pressure,
+		"temperature": measurement.Temperature,
+		"humidity":    measurement.Humidity,
+		"pressure":    measurement.Pressure,
 	}
 	timestamp, err := time.Parse("20060102150405", measurement.Timestamp)
 	if err != nil {
@@ -76,7 +76,7 @@ func (handler *influxdbHandler) Insert(measurement domain.Measurement) {
 		handler.logger.Fatal("influxdb: could not retrieve database name")
 	}
 
-	var measurementBatchPoint = influxdb.BatchPointsConfig {
+	var measurementBatchPoint = influxdb.BatchPointsConfig{
 		Precision:        "",
 		Database:         database,
 		RetentionPolicy:  "",

@@ -89,7 +89,7 @@ func main() {
 
 	webserviceHandler := interfaces.WebserviceHandler{
 		MeasurementInteractor: measurementInteractor,
-		Logger: infrastructure.Logger{},
+		Logger:                infrastructure.Logger{},
 	}
 
 	http.HandleFunc("/measurements/climate", func(writer http.ResponseWriter, request *http.Request) {

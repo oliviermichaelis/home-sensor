@@ -14,7 +14,7 @@ func TestRegister(t *testing.T) {
 		t.Errorf("test: unexpected error: %v", err)
 	}
 	if s != fallback {
-		t.Errorf("test: unexpected fallback value: %s, expected: %s", s, fallback )
+		t.Errorf("test: unexpected fallback value: %s, expected: %s", s, fallback)
 	}
 
 	// assert that error is raised if key wasn't found and no fallback value was given
@@ -38,7 +38,7 @@ func TestGet(t *testing.T) {
 	s, err := c.get("")
 	if err == nil || len(s) > 0 {
 		t.Errorf("test: returned value should be empty: %v", err)
-		}
+	}
 
 	// case if config doesn't contain key
 	s, err = c.get("test")

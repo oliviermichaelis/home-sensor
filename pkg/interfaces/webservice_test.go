@@ -9,11 +9,11 @@ import (
 	"testing"
 )
 
-type mockedMeasurementInteractor struct {}
+type mockedMeasurementInteractor struct{}
 
 var testWebserviceHandler = WebserviceHandler{
 	MeasurementInteractor: &mockedMeasurementInteractor{},
-	Logger: infrastructure.Logger{},
+	Logger:                infrastructure.Logger{},
 }
 
 func (m *mockedMeasurementInteractor) Store(measurement domain.Measurement) error {
@@ -66,7 +66,7 @@ func TestClimateHandlerInvalidData(t *testing.T) {
 		t.Errorf("Expected StatusCode 400, was: %v", response.StatusCode)
 	}
 }
- */
+*/
 
 func TestClimateHandlerValidData(t *testing.T) {
 	measurement := domain.Measurement{
