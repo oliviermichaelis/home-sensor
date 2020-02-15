@@ -54,7 +54,7 @@ spec:
           securityContext:
             privileged: false
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.apiserver.resources | nindent 12 }}
       volumes:
         - name: influxdb-credentials
           secret:

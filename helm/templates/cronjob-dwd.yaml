@@ -28,42 +28,8 @@ spec:
             image: "{{ .Values.dwd.image.repository }}:{{ .Values.dwd.image.tag }}"
             imagePullPolicy: {{ .Values.dwd.image.pullPolicy }}
             env:
-            - name: RABBITMQ_SERVICE_URL
-              value: {{ .Values.rabbitmq.RABBITMQ_SERVICE_URL | quote }}
-            - name: RABBITMQ_SERVICE_PORT
-              value: {{ .Values.rabbitmq.RABBITMQ_SERVICE_PORT | quote }}
-            - name: RABBITMQ_QUEUE
-              value: {{ .Values.rabbitmq.RABBITMQ_QUEUE | quote }}
-            - name: RABBITMQ_EXCHANGE
-              value: {{ .Values.rabbitmq.RABBITMQ_EXCHANGE | quote }}
-            - name: RABBITMQ_SECRET_PATH
-              value: {{ .Values.dwd.volume.mountPath | quote }}
             - name: STATION_ID
               value: {{ .Values.dwd.env.STATION_ID | quote}}
-            volumeMounts:
-            - name: rabbitmq-credentials
-              mountPath: {{ .Values.dwd.volume.mountPath }}
             resources:
               {{- toYaml .Values.dwd.resources | nindent 14 }}
           restartPolicy: OnFailure
-          volumes:
-          - name: rabbitmq-credentials
-            secret:
-              secretName: {{ .Values.dwd.secretName }}
-              items:
-              - key: rabbitmq-username
-                path: username
-              - key: rabbitmq-password
-                path: password
-#    {{- with .Values.dwd.nodeSelector }}
-#    nodeSelector:
-#      {{- toYaml . | nindent 8 }}
-#    {{- end }}
-#    {{- with .Values.affinity }}
-#    affinity:
-#      {{- toYaml . | nindent 8 }}
-#    {{- end }}
-#    {{- with .Values.tolerations }}
-#    tolerations:
-#      {{- toYaml . | nindent 8 }}
-#    {{- end }}

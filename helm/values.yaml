@@ -2,42 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-producer:
-  image:
-    repository: oliviermichaelis/producer
-    tag: 0.0.104
-    pullPolicy: IfNotPresent
-    imagePullSecrets: []
-  replicaCount: 1
-  i2c:
-    path: /dev/i2c-1
-  secretName: rabbitmq-ha
-  volume:
-    mountPath: /credentials/rabbitmq
-  nameOverride: ""
-  fullnameOverride: ""
-  nodeSelector:
-    sensor: "yes"
-
-consumer:
-  image:
-    repository: oliviermichaelis/consumer
-    tag: 0.0.104
-    pullPolicy: IfNotPresent
-    imagePullSecrets: []
-  replicaCount: 1
-  env:
-    INFLUX_SERVICE_URL: influxdb.default.svc.cluster.local
-    INFLUX_SERVICE_PORT: 8086
-  influxSecret: influxdb-auth
-  rabbitmqSecret: rabbitmq-ha
-  volume:
-    mountPathInflux: /credentials/influx
-    mountPathRabbit: /credentials/rabbitmq
-  nameOverride: ""
-  fullnameOverride: ""
-  nodeSelector: {}
-
 apiserver:
   image:
     repository: oliviermichaelis/apiserver
@@ -52,13 +16,17 @@ apiserver:
   secrets:
     influxdb: influxdb-auth
     influxdata: influxdata
-  rabbitmqSecret: rabbitmq-ha
   volume:
     mountPathInflux: /credentials/influx
     mountPathInfluxdata: /credentials/influxdata
-  nameOverride: ""
-  fullnameOverride: ""
   nodeSelector: {}
+  resources:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
 
 dwd:
   image:
@@ -67,11 +35,6 @@ dwd:
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 1
-  secretName: rabbitmq-ha
-  volume:
-    mountPath: /credentials/rabbitmq
-  nameOverride: ""
-  fullnameOverride: ""
   env:
     STATION_ID: 443
   resources:
@@ -82,12 +45,6 @@ dwd:
       cpu: 300m
       memory: 512Mi
 
-rabbitmq:
-  RABBITMQ_SERVICE_URL: rabbitmq-ha.default.svc.cluster.local
-  RABBITMQ_SERVICE_PORT: 5672
-  RABBITMQ_QUEUE: sensor
-  RABBITMQ_EXCHANGE: sensor
-
 service:
   type: ClusterIP
   port: 80
@@ -96,31 +53,13 @@ ingress:
   enabled: true
   annotations: {}
     # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # kubernetes.io/tls-acme: "true"
   hosts:
     - host: apiserver.lab.oliviermichaelis.dev
       paths:
-      - /measurements/climate
+        - /measurements/climate
 
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
-
-resources:
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  requests:
-    cpu: 10m
-    memory: 16Mi
-  limits:
-    cpu: 100m
-    memory: 128Mi
-
-
-
-tolerations: []
-
-affinity: {}
