@@ -8,7 +8,7 @@ apiserver:
     tag: 0.1.1
     pullPolicy: IfNotPresent
     imagePullSecrets: []
-  replicaCount: 1
+  replicaCount: 2
   env:
     INFLUX_SERVICE_URL: influxdb.default.svc.cluster.local
     INFLUX_SERVICE_PORT: 8086
