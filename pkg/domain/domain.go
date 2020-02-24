@@ -7,6 +7,7 @@ import (
 
 type MeasurementRepository interface {
 	Store(measurement Measurement)
+	RetrieveLastWindow(station string, duration time.Duration) (*[]Measurement, error)
 }
 
 // TODO change Timestamp to go time representation

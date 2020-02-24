@@ -1,10 +1,14 @@
 package infrastructure
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/influxdata/influxdb1-client/models"
 	influxdb "github.com/influxdata/influxdb1-client/v2"
 	"github.com/oliviermichaelis/home-sensor/pkg/domain"
+	"html/template"
 	"net"
 	"time"
 )
@@ -14,6 +18,15 @@ const EnvInfluxDatabase = "INFLUX_DATABASE"
 type influxdbHandler struct {
 	client influxdb.Client
 	logger Logger
+}
+
+// TODO needs to be refactored!!
+type Climate struct {
+	Timestamp   time.Time `json:"timestamp"`
+	Station     string    `json:"station"`
+	Temperature float64   `json:"temperature"`
+	Humidity    float64   `json:"humidity"`
+	Pressure    float64   `json:"pressure"`
 }
 
 func NewInfluxdbHandler(host string, port string, username string, password string) (*influxdbHandler, error) {
@@ -121,8 +134,127 @@ func (handler *influxdbHandler) Insert(measurement domain.Measurement) {
 	handler.logger.Log(message)
 }
 
+// TODO break up into smaller functions. Reuse code
+func (handler *influxdbHandler) RetrieveLastWindow(station string, duration time.Duration) (*[]domain.Measurement, error) {
+	// Subtract duration from current time in UTC to get last window
+	t := time.Now().UTC().Add(-duration)
+
+	database, err := GetConfig(EnvInfluxDatabase)
+	if err != nil {
+		return nil, err
+	}
+
+	// query template populated with values
+	data := map[string]interface{}{
+		"measurement": database,
+		"station":     station,
+		"timestamp":   t.Format(time.RFC3339),
+	}
+
+	tmpl, err := template.New("window").Parse("SELECT temperature, humidity, pressure FROM {{ .measurement }} WHERE station = '{{ .station }}' and time > '{{ .timestamp }}'")
+	if err != nil {
+		return nil, err
+	}
+
+	var b bytes.Buffer
+	if tmpl.Execute(&b, data) != nil {
+		return nil, err
+	}
+
+	// execute query
+	q := influxdb.Query{
+		Command:  b.String(),
+		Database: "sensor",
+	}
+	resp, err := handler.client.Query(q)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Error() != nil {
+		return nil, resp.Error()
+	}
+
+	// parse query
+	// TODO use domain.Measurement
+	var values []*Climate
+	for _, r := range resp.Results {
+		for _, s := range r.Series {
+			v, err := parseSeries(&s, "")
+			if err != nil {
+				return nil, err
+			}
+			values = append(values, v...)
+		}
+	}
+
+	v := climatesToMeasurements(values)
+	return &v, nil
+}
+
 // Returns the connection URL for the influxdb client
 // TODO add flag for https
 func influxURL(host string, port string) string {
 	return fmt.Sprintf("http://%s:%s", host, port)
 }
+
+func parseSeries(row *models.Row, station string) ([]*Climate, error) {
+	// index the order of columns
+	index := make(map[string]int)
+	for i, v := range row.Columns {
+		index[v] = i
+	}
+
+	// convert values to climate object
+	var values []*Climate
+	for _, v := range row.Values {
+		//t := index["timestamp"]
+		t, err := time.Parse(time.RFC3339, v[index["time"]].(string))
+		if err != nil {
+			return nil, err
+		}
+
+		temp, err := v[index["temperature"]].(json.Number).Float64()
+		humid, err := v[index["humidity"]].(json.Number).Float64()
+		press, err := v[index["pressure"]].(json.Number).Float64()
+
+		values = append(values, &Climate{
+			Timestamp:   t,
+			Station:     station,
+			Temperature: temp,
+			Humidity:    humid,
+			Pressure:    press,
+		})
+	}
+	return values, nil
+}
+
+// TODO delete when refactor
+func climateToMeasurement(climate *Climate) domain.Measurement {
+	return domain.Measurement{
+		Timestamp:   climate.Timestamp.Format("20060102150405"),
+		Station:     climate.Station,
+		Temperature: climate.Temperature,
+		Humidity:    climate.Humidity,
+		Pressure:    climate.Pressure,
+	}
+}
+
+func climatesToMeasurements(c []*Climate) []domain.Measurement {
+	var m []domain.Measurement
+	for _, climate := range c {
+		m = append(m, climateToMeasurement(climate))
+	}
+	return m
+}
+
+/*
+func addMissingStation(c []*Climate, s string) []*Climate {
+	for _, v := range c {
+		if v.Station != "" {
+			continue
+		}
+		v.Station = s
+	}
+	return c
+}
+ */

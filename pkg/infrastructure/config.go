@@ -60,7 +60,7 @@ func GetConfig(key string) (string, error) {
 	return configMap.get(key)
 }
 
-// TODO deprecated, use ReadConfig
+// TODO deprecated, use ReadSecret
 // Returns the username read from a 'username' file under the specified parameter
 func ReadUsername(secretPath string) (string, error) {
 	u, err := ioutil.ReadFile(secretPath + "/username")
@@ -74,6 +74,7 @@ func ReadPassword(secretPath string) (string, error) {
 	return string(p), err
 }
 
+// Returns the secret read from the path
 func ReadSecret(path string) (string, error) {
 	c, err := ioutil.ReadFile(path)
 	return string(c), err

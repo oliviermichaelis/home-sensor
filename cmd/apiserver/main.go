@@ -23,7 +23,7 @@ func main() {
 		logger.Log(err.Error())
 	}
 
-	secretPath, err := infrastructure.RegisterConfig("INFLUX_SECRET_PATH", "/credentials/influx")
+	secretPath, err := infrastructure.RegisterConfig("SECRET_PATH", "/credentials")
 	if err != nil {
 		logger.Log(err.Error())
 	}
@@ -40,13 +40,13 @@ func main() {
 	//	logger.Log(err.Error())
 	//}
 
-	username, err := infrastructure.ReadUsername(secretPath)
+	username, err := infrastructure.ReadUsername(secretPath + "/influxdb")
 	if err != nil {
 		logger.Log(err.Error())
 		os.Exit(3)
 	}
 
-	password, err := infrastructure.ReadPassword(secretPath)
+	password, err := infrastructure.ReadPassword(secretPath + "/influxdb")
 	if err != nil {
 		logger.Log(err.Error())
 		os.Exit(3)
@@ -59,17 +59,17 @@ func main() {
 	}
 
 	// setup connection to influxdata cloud
-	influxUrl, err := infrastructure.ReadSecret("/credentials/influxdata/url")
+	influxUrl, err := infrastructure.ReadSecret(secretPath + "/influxdata/url")
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	token, err := infrastructure.ReadSecret("/credentials/influxdata/token")
+	token, err := infrastructure.ReadSecret(secretPath + "/influxdata/token")
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	org, err := infrastructure.ReadSecret("/credentials/influxdata/org")
+	org, err := infrastructure.ReadSecret(secretPath + "/influxdata/org")
 	if err != nil {
 		logger.Fatal(err)
 	}

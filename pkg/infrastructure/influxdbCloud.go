@@ -5,6 +5,7 @@ import (
 	"fmt"
 	influxdb2 "github.com/influxdata/influxdb-client-go"
 	"github.com/oliviermichaelis/home-sensor/pkg/domain"
+	"log"
 	"time"
 )
 
@@ -58,4 +59,10 @@ func (handler *influxCloudHandler) Insert(measurement domain.Measurement) {
 		message := fmt.Sprintf("influxdbcloud: %v", err)
 		handler.logger.Log(message)
 	}
+}
+
+func (handler *influxCloudHandler) RetrieveLastWindow(station string, duration time.Duration) (*[]domain.Measurement, error) {
+	// TODO implement
+	log.Fatal("not implemented yet")
+	return &[]domain.Measurement{}, nil
 }
