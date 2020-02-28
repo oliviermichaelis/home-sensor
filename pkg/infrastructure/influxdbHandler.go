@@ -65,6 +65,8 @@ func NewInfluxdbHandler(host string, port string, username string, password stri
 		influx.logger.Fatal(err.Error())
 	}
 	influx.client = client
+
+	fmt.Println(client.Ping(time.Duration(time.Second * 10)))
 	return &influx, nil
 }
 
@@ -157,7 +159,7 @@ func (handler *influxdbHandler) RetrieveLastWindow(station string, duration time
 	}
 
 	var b bytes.Buffer
-	if tmpl.Execute(&b, data) != nil {
+	if err := tmpl.Execute(&b, data); err != nil {
 		return nil, err
 	}
 
@@ -217,6 +219,7 @@ func parseSeries(row *models.Row, station string) ([]*Climate, error) {
 		humid, err := v[index["humidity"]].(json.Number).Float64()
 		press, err := v[index["pressure"]].(json.Number).Float64()
 
+		// TODO somehow station still empty in json
 		values = append(values, &Climate{
 			Timestamp:   t,
 			Station:     station,
@@ -231,7 +234,7 @@ func parseSeries(row *models.Row, station string) ([]*Climate, error) {
 // TODO delete when refactor
 func climateToMeasurement(climate *Climate) domain.Measurement {
 	return domain.Measurement{
-		Timestamp:   climate.Timestamp.Format("20060102150405"),
+		Timestamp:   climate.Timestamp.Format(time.RFC3339),
 		Station:     climate.Station,
 		Temperature: climate.Temperature,
 		Humidity:    climate.Humidity,

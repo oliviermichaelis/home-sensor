@@ -7,6 +7,7 @@ import (
 	"github.com/oliviermichaelis/home-sensor/pkg/infrastructure"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 type mockedMeasurementInteractor struct{}
@@ -20,8 +21,12 @@ func (m *mockedMeasurementInteractor) Store(measurement domain.Measurement) erro
 	return nil
 }
 
+func (m *mockedMeasurementInteractor) RetrieveLastWindow(station string, duration time.Duration) (*[]domain.Measurement, error) {
+	return nil, nil
+}
+
 func TestClimateHandlerInvalidMethod(t *testing.T) {
-	request := httptest.NewRequest("GET", "https://apiserver.lab.oliviermichaelis.dev/measurements/climate", nil)
+	request := httptest.NewRequest("PUT", "https://apiserver.lab.oliviermichaelis.dev/measurements/climate", nil)
 	recorder := httptest.NewRecorder()
 
 	testWebserviceHandler.ClimateHandler(recorder, request)

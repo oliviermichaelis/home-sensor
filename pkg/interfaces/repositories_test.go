@@ -3,12 +3,15 @@ package interfaces
 import (
 	"github.com/oliviermichaelis/home-sensor/pkg/domain"
 	"testing"
+	"time"
 )
 
 type mockedDatabaseHandler struct{}
 
-func (h *mockedDatabaseHandler) Insert(measurement domain.Measurement) {
-	return
+func (h *mockedDatabaseHandler) Insert(measurement domain.Measurement) {}
+
+func (h *mockedDatabaseHandler) RetrieveLastWindow(station string, duration time.Duration) (*[]domain.Measurement, error) {
+	return nil, nil
 }
 
 func TestNewDatabaseMeasurementRepo(t *testing.T) {

@@ -4,6 +4,7 @@ import (
 	"github.com/oliviermichaelis/home-sensor/pkg/domain"
 	"github.com/oliviermichaelis/home-sensor/pkg/infrastructure"
 	"testing"
+	"time"
 )
 
 var validMeasurement = domain.Measurement{
@@ -16,12 +17,17 @@ var validMeasurement = domain.Measurement{
 
 type mockedMeasurementRepository struct{}
 
-func (m *mockedMeasurementRepository) Store(measurement domain.Measurement) {
-	return
+//func (m *mockedMeasurementRepository) Store(measurement domain.Measurement) {}
+
+func (m mockedMeasurementRepository) Store(measurement domain.Measurement) {}
+
+func (m mockedMeasurementRepository) RetrieveLastWindow(station string, duration time.Duration) (*[]domain.Measurement, error) {
+	return nil, nil
 }
+
 func TestMeasurementInteractor_Store(t *testing.T) {
 	measurementInteractor := MeasurementInteractor{
-		MeasurementRepository: &mockedMeasurementRepository{},
+		MeasurementRepository: mockedMeasurementRepository{},
 		Logger:                infrastructure.Logger{},
 	}
 
