@@ -28,6 +28,26 @@ apiserver:
       cpu: 100m
       memory: 128Mi
 
+alertmanager:
+  image:
+    repository: oliviermichaelis/alertmanager
+    tag: 0.0.1
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
+  replicaCount: 1
+  secrets:
+    secret: alertmanager
+  volume:
+    mountPathSecret: /credentials
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 20m
+      memory: 16Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
 dwd:
   image:
     repository: oliviermichaelis/dwd
