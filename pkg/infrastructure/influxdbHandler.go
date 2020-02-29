@@ -181,7 +181,7 @@ func (handler *influxdbHandler) RetrieveLastWindow(station string, duration time
 	var values []*Climate
 	for _, r := range resp.Results {
 		for _, s := range r.Series {
-			v, err := parseSeries(&s, "")
+			v, err := parseSeries(&s, station)
 			if err != nil {
 				return nil, err
 			}
