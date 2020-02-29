@@ -5,7 +5,7 @@
 apiserver:
   image:
     repository: oliviermichaelis/apiserver
-    tag: 0.1.1
+    tag: 0.1.3
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   replicaCount: 2
@@ -17,12 +17,12 @@ apiserver:
     influxdb: influxdb-auth
     influxdata: influxdata
   volume:
-    mountPathInflux: /credentials/influx
+    mountPathInflux: /credentials/influxdb
     mountPathInfluxdata: /credentials/influxdata
   nodeSelector: {}
   resources:
     requests:
-      cpu: 10m
+      cpu: 20m
       memory: 16Mi
     limits:
       cpu: 100m
