@@ -1,100 +1,40 @@
 package main
 
 import (
-	"github.com/oliviermichaelis/home-sensor/pkg/infrastructure"
-	"github.com/oliviermichaelis/home-sensor/pkg/interfaces"
-	"github.com/oliviermichaelis/home-sensor/pkg/usecases"
+	"flag"
+	"github.com/oliviermichaelis/home-sensor/pkg/apiserver"
+	"io/ioutil"
+	"log"
 	"net/http"
-	"os"
 )
 
+func readSecret(path string) (string, error) {
+	s, err := ioutil.ReadFile(path)
+	return string(s), err
+}
+
 func main() {
-	// initialize logger
-	logger := infrastructure.Logger{}
+	flagDebug := flag.Bool("debug", false, "Enable debug output")
+	flagInfluxURL := flag.String("influx.url", "localhost", "URL of influxdb database")
+	flagInfluxPort := flag.Int("influx.port", 8086, "Influxdb port")
+	flagInfluxUsernamePath := flag.String("influx.secrets.username", "/secrets/influx/username", "Path at which username is stored")
+	flagInfluxPasswordPath := flag.String("influx.secrets.password", "/secrets/influx/password", "Path at which password is stored")
+	flag.Parse()
 
-	// initialize configuration
-	url, err := infrastructure.RegisterConfig("INFLUX_SERVICE_URL", "localhost")
+	influxUser, err := readSecret(*flagInfluxUsernamePath)
 	if err != nil {
-		logger.Log(err.Error())
+		log.Fatalf("can't read username: %v", err)
 	}
 
-	port, err := infrastructure.RegisterConfig("INFLUX_SERVICE_PORT", "8086")
+	influxPassword, err := readSecret(*flagInfluxPasswordPath)
 	if err != nil {
-		logger.Log(err.Error())
+		log.Fatalf("can't read password: %v", err)
 	}
 
-	secretPath, err := infrastructure.RegisterConfig("SECRET_PATH", "/credentials")
-	if err != nil {
-		logger.Log(err.Error())
-	}
-
-	if _, err := infrastructure.RegisterConfig(infrastructure.EnvInfluxDatabase, "sensor"); err != nil {
-		logger.Log(err)
-	}
-
-	if _, err := infrastructure.RegisterConfig("DEBUG", "false"); err != nil {
-		logger.Log(err.Error())
-	}
-
-	//if _, err := infrastructure.RegisterConfig("STATION_ID", ""); err != nil {
-	//	logger.Log(err.Error())
-	//}
-
-	username, err := infrastructure.ReadUsername(secretPath + "/influxdb")
-	if err != nil {
-		logger.Log(err.Error())
-		os.Exit(3)
-	}
-
-	password, err := infrastructure.ReadPassword(secretPath + "/influxdb")
-	if err != nil {
-		logger.Log(err.Error())
-		os.Exit(3)
-	}
-
-	// setup database connection
-	databaseHandler, err := infrastructure.NewInfluxdbHandler(url, port, username, password)
-	if err != nil {
-		logger.Fatal(err)
-	}
-
-	// setup connection to influxdata cloud
-	influxUrl, err := infrastructure.ReadSecret(secretPath + "/influxdata/url")
-	if err != nil {
-		logger.Fatal(err)
-	}
-
-	token, err := infrastructure.ReadSecret(secretPath + "/influxdata/token")
-	if err != nil {
-		logger.Fatal(err)
-	}
-
-	org, err := infrastructure.ReadSecret(secretPath + "/influxdata/org")
-	if err != nil {
-		logger.Fatal(err)
-	}
-
-	influxdataHandler, err := infrastructure.NewInfluxCloudHandler(influxUrl, token, org)
-	if err != nil {
-		logger.Fatal(err)
-	}
-
-	handlers := make(map[string]interfaces.DatabaseHandler)
-	handlers["DatabaseMeasurementRepo"] = databaseHandler
-	handlers["DatabaseInfluxCloudRepo"] = influxdataHandler
-
-	measurementInteractor := new(usecases.MeasurementInteractor)
-	measurementInteractor.MeasurementRepository = interfaces.NewDatabaseMeasurementRepo(handlers)
-	measurementInteractor.Logger = infrastructure.Logger{}
-
-	webserviceHandler := interfaces.WebserviceHandler{
-		MeasurementInteractor: measurementInteractor,
-		Logger:                infrastructure.Logger{},
-	}
-
-	http.HandleFunc("/measurements/climate", func(writer http.ResponseWriter, request *http.Request) {
-		webserviceHandler.ClimateHandler(writer, request)
-	})
-
-	logger.Fatal(http.ListenAndServe(":8080", nil))
+	// TODO add prometheus /metrics
+	// TODO add profiler /pprof
+	mux := http.NewServeMux()
+	repo := apiserver.NewInfluxDbRepository(*flagDebug, *flagInfluxURL, *flagInfluxPort, influxUser, influxPassword)
+	server := apiserver.NewServer(*flagDebug, mux, ":8080", repo)
+	log.Fatal(server.Start())
 }
