@@ -1,9 +1,10 @@
 version: '3'
 services:
   influxdb:
-    image: "influxdb:latest"
+    image: "quay.io/influxdb/influxdb:2.0.0-beta"
     ports:
       - "8086:8086"
+      - "9999:9999"
     environment:
       - INFLUXDB_DB=sensor
       - INFLUXDB_USER=guest
